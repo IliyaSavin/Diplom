@@ -1,14 +1,14 @@
 ﻿var config = {
     authentication: {
         options: {
-          userName: "adminserv", // update me
-          password: "123456789Qw" // update me
+          userName: "ecoAdmin", // update me
+          password: "SensorsPassword12#" // update me
         },
         type: "default"
       },
-      server: "nubipsserver.database.windows.net", // update me
+      server: "ecosensors.database.windows.net", // update me
       options: {
-        database: "Practice", //update me
+        database: "EcoSensorsAzure", //update me
         encrypt: true,
         packetSize: 32768,
         trustServerCertificate: true
