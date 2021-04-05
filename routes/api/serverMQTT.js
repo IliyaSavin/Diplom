@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const config = require('../../config/db');
 const { Connection, Request } = require("tedious");
+const auth = require('../../middleware/auth');
 
-router.post('/status', async (req, res) => {
+router.post('/status', auth, async (req, res) => {
     const {id, status} = req.body;
     var result = {};
-    var connection = new Connection(config);
+    var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
         request = new Request(`update MQTT_Server set Status = '${status}' where ID_Server = ${id}`, function(err, rowCount, rows) {
@@ -25,8 +26,8 @@ router.post('/status', async (req, res) => {
     });
 })
 
-router.get('/', async (req, res) => {
-    var connection = new Connection(config);
+router.get('/', auth, async (req, res) => {
+    var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
         var all = [];

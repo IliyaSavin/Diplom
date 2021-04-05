@@ -28,6 +28,7 @@ var options={
 var client  = mqtt.connect('mqtt://178.54.99.45:1883', options)
 
 client.on('connect', function () {
+  console.log('connected');
   client.subscribe('monitor/#', {rh: true}, function (err) {
     if (err) {
       console.log(err);
@@ -35,7 +36,11 @@ client.on('connect', function () {
   })
 })
 
-setInterval(() => getMeasurementsBot(), 120000);
+var workingStatus = 0;
+
+setInterval(() => checkWorkingStatus(), 10000);
+
+setInterval(() => workingStatus == 1 ? getMeasurementsBot() : {}, 120000);
 
 // 2 minutes = 120000
 
@@ -51,20 +56,29 @@ var measurmentUnitId = {
 var currentParametrCount = 0;
 var tempMeasurment = {};
 
- 
+var lastUpdate = new Date();
 client.on('message', function (topic, message) {
   // message is Buffer
-  //console.log(topic.toString());
-  //console.log(message.toString());
+  console.log(topic.toString());
+  console.log(message.toString());
 
-  if (topic.toString() == ('monitor/dev01/' + measurmentList[currentParametrCount])) {
+  
+// Do your operations
+
+
+  if (topic.toString() == ('monitor/dev05/' + measurmentList[currentParametrCount])) {
     tempMeasurment[measurmentList[currentParametrCount]] = message.toString();
     currentParametrCount++;
   }
 
   if (currentParametrCount >= measurmentList.length) {
-    console.log(tempMeasurment);
-    writeMeasurmentMQTT('1001', tempMeasurment, measurmentUnitId);
+    var currentDate = new Date();
+    var seconds = (currentDate.getTime() - lastUpdate.getTime()) / 1000;
+    if (seconds >= 110) {
+      console.log(tempMeasurment);
+      if (workingStatus == 1) writeMeasurmentMQTT('1001', tempMeasurment, measurmentUnitId);
+      lastUpdate = new Date();
+    }
     tempMeasurment = {};
     currentParametrCount = 0;
   }
@@ -84,7 +98,7 @@ async function writeMeasurmentMQTT(ID_Station, measurments, ID_Unit_List) {
 
 // MQTT one Measurment write
 async function writeOneMeasurment(ID_Station, value, ID_Unit) {
-  var connection = new Connection(config);
+  var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
         sqlRequest = new Request(`insert into Measurment(Value, ID_Station, ID_Measured_Unit) values( ${value}, '${ID_Station}', ${ID_Unit})`, function(err, rowCount, rows) {
@@ -110,7 +124,7 @@ async function getMeasurementsBot() {
   var stationsID = [];
   var stationsInfo = [];
   var stationsIDtoEcoID = [];
-  var connection = new Connection(config);
+  var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
         let sqlRequest = new Request("select ID_Station, ID_SaveEcoBot from Station where Status = 'enabled' AND ID_SaveEcoBot IS NOT NULL", function(err, rowCount, rows) {
@@ -160,6 +174,27 @@ async function getMeasurementsBot() {
 }
 
 
+async function checkWorkingStatus() {
+  var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var all = [];
+        sqlRequest = new Request("select Working_Status from System_Configuration where Configuration_ID = 1;", function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err)
+            } else {
+                //console.log(`status: ${workingStatus}`);
+            }
+        });
+        sqlRequest.on("row", columns => {
+            workingStatus = columns[0].value;
+          });
+        connection.execSql(sqlRequest);
+    })
+}
+
+
 
 client.on("error",function(error){ console.log("Can't connect"+error)
 });
@@ -178,10 +213,8 @@ app.use((req, res, next) => {
 
 app.use('/server', require('./routes/api/serverMQTT'));
 app.use('/station', require('./routes/api/station'));
-
-//app.use('/api/get', require('./routes/api/get'));
-//app.use('/api/main', require('./routes/api/main'));
-//app.use('/api/add', require('./routes/api/add'));
+app.use('/admin', require('./routes/api/admin'));
+app.use('/auth', require('./routes/api/auth'));
 
 app.get('/', (req, res) => {
 })
