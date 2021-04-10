@@ -212,4 +212,27 @@ router.post('/units/', auth, async (req, res) => {
     })
 });
 
+// @route    POST station/delete
+// @desc     Delete station by station id
+// @access   Public
+router.post('/delete/', auth, async (req, res) => {
+    const {ID_Station} = req.body;
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        request = new Request(`Delete from Station where ID_Station='${ID_Station}'`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json({
+                    message: "Station deleted"
+                });
+            }
+        });
+        connection.execSql(request);
+    })
+});
+
 module.exports = router;
