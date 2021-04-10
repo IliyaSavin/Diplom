@@ -39,6 +39,10 @@ function StationsPage() {
     dispatch(getAdminConfig());
   }, []);
 
+  useEffect(() => {
+    if (!searchValue) dispatch(getStations(`?order=${sortValue}`));
+  }, [searchValue]);
+
   const onSearch = (value) => {
     setSearchValue(value);
     let string = searchValue

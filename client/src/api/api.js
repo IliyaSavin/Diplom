@@ -13,6 +13,18 @@ export const userAPI = {
     instance
       .post('auth', {login: login, password: password})
       .then((response) => response.data),
+  addUser: (login, password) =>
+    instance
+      .post(
+        'admin/addUser',
+        {login: login, password: password},
+        {
+          headers: {
+            'x-auth-token': sessionStorage.getItem('token'),
+          },
+        }
+      )
+      .then((response) => response.data),
 };
 
 export const stationsAPI = {
