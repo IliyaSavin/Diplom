@@ -28,7 +28,7 @@ var options={
 var client  = mqtt.connect('mqtt://178.54.99.45:1883', options)
 
 client.on('connect', function () {
-  console.log('connected');
+  //console.log('connected');
   client.subscribe('monitor/#', {rh: true}, function (err) {
     if (err) {
       console.log(err);

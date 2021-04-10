@@ -135,7 +135,7 @@ router.get('/system/', auth, async (req, res) => {
     })
 });
 
-// @route    GET api/station/ecoBot
+// @route    GET station/ecoBot
 // @desc     Get station list on ecoBot by url params
 // @access   Public
 router.get('/ecoBot/', auth, async (req, res) => {
@@ -162,6 +162,54 @@ router.get('/ecoBot/', auth, async (req, res) => {
         res.json(stationsInfo);
     })
 
+});
+
+// @route    station/cityListEcoBot
+// @desc     Get city list on ecoBot by url params
+// @access   Public
+router.get('/cityListEcoBot/', auth, async (req, res) => {
+    var url = req.query;
+    var cityList = [];
+    requestToAPI('https://api.saveecobot.com/output.json', { json: true }, function (error, response, body) {
+            body.forEach(station => {
+                if (!cityList.includes(station.cityName)) {
+                    cityList.push(station.cityName);
+                }
+        });
+        res.json(cityList);
+    })
+
+});
+
+// @route    POST station/units
+// @desc     Get unit list for station by station id
+// @access   Public
+router.post('/units/', auth, async (req, res) => {
+    const {ID_Station} = req.body;
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var all = [];
+        request = new Request(`select Title
+                                from Measurment inner join Measured_Unit
+                                ON Measurment.ID_Measured_Unit = Measured_Unit.ID_Measured_Unit
+                                where ID_Station = '${ID_Station}'
+                                group by Title;`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json(all);
+            }
+        });
+        request.on("row", columns => {
+            columns.forEach(column => {
+              all.push(column.value);
+            });
+          });
+        connection.execSql(request);
+    })
 });
 
 module.exports = router;
