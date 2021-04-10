@@ -6,6 +6,7 @@ import {
   getEcoBotStations,
   selectPage,
   setPage,
+  selectCityList,
 } from '../../redux/features/addStationSlice';
 import {setCurrentPageIndex} from '../../redux/features/stationsSlice';
 import Loader from '../Loader/Loader';
@@ -21,14 +22,22 @@ function AddStation() {
   const allStations = useSelector(selectAllStationEcoBot);
   const isLoading = useSelector(selectIsLoading);
   const page = useSelector(selectPage);
+  const cityList = useSelector(selectCityList);
 
   let pageSize = 10;
   const [searchValue, setSearchValue] = useState('');
+  const [selectedCityIndex, setSelectedCityIndex] = useState(0);
 
   useEffect(() => {
     dispatch(setCurrentPageIndex(['3']));
-    dispatch(getEcoBotStations('?city=Kyiv'));
+    cityList &&
+      dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
   }, []);
+
+  useEffect(() => {
+    cityList &&
+      dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
+  }, [selectedCityIndex]);
 
   let portionStation = allStations?.slice(page * 10 - 10, page * pageSize);
 
@@ -41,7 +50,14 @@ function AddStation() {
 
   const onSearch = (value) => {};
   const handleChangeSelect = (value) => {};
-  const onChangePage = (page, pageSize) => dispatch(setPage(page));
+  const onChangePage = (page, pageSize) => {
+    dispatch(setPage(page));
+    window.scrollTo(0, 0);
+  };
+
+  const onChangeSelect = (value) => {
+    setSelectedCityIndex(value);
+  };
 
   if (isLoading) return <Loader />;
 
@@ -61,16 +77,24 @@ function AddStation() {
           City
           <div>
             <Select
-              style={{width: 120}}
+              style={{width: 170}}
               onChange={handleChangeSelect}
               className={s.select}
-            ></Select>
+              onChange={onChangeSelect}
+              defaultValue={selectedCityIndex}
+            >
+              {cityList?.map((c, index) => (
+                <Option value={index}>{c}</Option>
+              ))}
+            </Select>
           </div>
         </div>
       </div>
       <div className={s.stationWrapper}>
-        {portionStation !== undefined && portionStation.map((s) => <Station />)}
+        {portionStation !== undefined &&
+          portionStation.map((s) => <Station station={s} />)}
         <Pagination
+          className={s.pagination}
           defaultCurrent={page}
           total={allStations?.length}
           onChange={onChangePage}

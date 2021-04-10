@@ -46,7 +46,7 @@ function Station({station}) {
       <div className={s.stationMap}>
         <MapContainer
           center={dot}
-          zoom={10}
+          zoom={9}
           scrollWheelZoom={false}
           style={{maxWidth: 300, width: '100%', height: 200}}
         >

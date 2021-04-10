@@ -27,15 +27,28 @@ export const addStationSlice = createSlice({
         page: action.payload,
       };
     },
+    setCityList: (state, action) => {
+      return {
+        ...state,
+        cityList: action.payload,
+      };
+    },
   },
 });
 
-export const {setAllStationsEco, setLoading, setPage} = addStationSlice.actions;
+export const {
+  setAllStationsEco,
+  setLoading,
+  setPage,
+  setCityList,
+} = addStationSlice.actions;
 
 //@Thunks
 export const getEcoBotStations = (string) => async (dispatch) => {
   dispatch(setLoading(true));
   const data = await stationsAPI.getAllStationsEcoBot(string);
+  const city = await stationsAPI.getCityListEcoBot();
+  dispatch(setCityList(city));
   dispatch(setAllStationsEco(data));
   dispatch(setLoading(false));
 };
@@ -45,5 +58,6 @@ export const getEcoBotStations = (string) => async (dispatch) => {
 export const selectAllStationEcoBot = (state) => state.addStation.allStations;
 export const selectIsLoading = (state) => state.addStation.isLoading;
 export const selectPage = (state) => state.addStation.page;
+export const selectCityList = (state) => state.addStation.cityList;
 
 export default addStationSlice.reducer;
