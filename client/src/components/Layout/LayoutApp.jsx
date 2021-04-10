@@ -4,6 +4,7 @@ import React, {useState} from 'react';
 import {Link, Redirect, Route, Switch} from 'react-router-dom';
 import {useSelector} from 'react-redux';
 import {selectIsAuth} from '../../redux/features/authSlice';
+import StationsPage from '../StationsPage/StationsPage';
 
 const {SubMenu} = Menu;
 const {Content, Sider} = Layout;
@@ -39,7 +40,9 @@ const LayoutApp = () => {
               minHeight: 280,
             }}
           >
-            <Switch></Switch>
+            <Switch>
+              <Route exact path='/' component={StationsPage} />
+            </Switch>
           </Content>
         </Layout>
       </Layout>

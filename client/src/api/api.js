@@ -18,7 +18,7 @@ export const userAPI = {
 export const stationsAPI = {
   getAllStations: (string) =>
     instance
-      .get(`api/station/${string}`, {
+      .get(`station/system/${string}`, {
         headers: {
           'x-auth-token': sessionStorage.getItem('token'),
         },
@@ -27,7 +27,7 @@ export const stationsAPI = {
   getStationsUnit: (id) =>
     instance
       .post(
-        'api/station/units/',
+        'station/units',
         {ID_Station: id},
         {
           headers: {
@@ -36,11 +36,15 @@ export const stationsAPI = {
         }
       )
       .then((response) => response.data),
-  getStationFullUnits: (id) =>
+
+  changeStatus: (id, status) =>
     instance
       .post(
-        'api/station/unitsFull/',
-        {ID_Station: id},
+        'station/status',
+        {
+          id: id,
+          status: status,
+        },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -48,11 +52,13 @@ export const stationsAPI = {
         }
       )
       .then((response) => response.data),
-  getStationOptimal: (idUnit) =>
+  deleteStation: (id) =>
     instance
       .post(
-        'api/measurement/optimalValue',
-        {ID_Measured_Unit: idUnit},
+        'station/delete',
+        {
+          ID_Station: id,
+        },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -60,15 +66,20 @@ export const stationsAPI = {
         }
       )
       .then((response) => response.data),
-  getStationMeasurements: (DateFrom, DateTo, ID_Station, ID_Measured_Unit) =>
+  getAdminConfig: () =>
+    instance
+      .get('admin/config', {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+  setGlobalStatus: (status) =>
     instance
       .post(
-        'api/station/measurements',
+        'admin/setWorkingStatus',
         {
-          DateFrom: DateFrom,
-          DateTo: DateTo,
-          ID_Station: ID_Station,
-          ID_Measured_Unit: ID_Measured_Unit,
+          status: status,
         },
         {
           headers: {
