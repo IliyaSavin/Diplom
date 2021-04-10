@@ -7,6 +7,7 @@ import {selectIsAuth} from '../../redux/features/authSlice';
 import StationsPage from '../StationsPage/StationsPage';
 import CreateUser from '../СreateUser/CreateUser';
 import {selectCurrentPageIndex} from '../../redux/features/stationsSlice';
+import AddStation from '../AddStation/AddStation';
 
 const {SubMenu} = Menu;
 const {Content, Sider} = Layout;
@@ -38,6 +39,9 @@ const LayoutApp = () => {
               <Menu.Item key='2'>
                 <Link to='/createuser'>Create User</Link>
               </Menu.Item>
+              <Menu.Item key='3'>
+                <Link to='/addstation'>Add Station</Link>
+              </Menu.Item>
             </SubMenu>
           </Menu>
         </Sider>
@@ -53,6 +57,7 @@ const LayoutApp = () => {
             <Switch>
               <Route exact path='/' component={StationsPage} />
               <Route exact path='/createuser' component={CreateUser} />
+              <Route exact path='/addstation' component={AddStation} />
             </Switch>
           </Content>
         </Layout>

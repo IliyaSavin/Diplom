@@ -100,4 +100,12 @@ export const stationsAPI = {
         }
       )
       .then((response) => response.data),
+  getAllStationsEcoBot: (string) =>
+    instance
+      .get(`station/ecoBot/${string}`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
 };

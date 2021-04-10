@@ -2,6 +2,7 @@ import {configureStore} from '@reduxjs/toolkit';
 import authReducer from '../features/authSlice';
 import stationsReducer from '../features/stationsSlice';
 import userReducer from '../features/userSlice';
+import addStationReducer from '../features/addStationSlice';
 
 //import {reducer as formReducer} from 'redux-form';
 
@@ -10,6 +11,7 @@ export default configureStore({
     auth: authReducer,
     stations: stationsReducer,
     user: userReducer,
+    addStation: addStationReducer,
     //form: formReducer,
   },
 });
