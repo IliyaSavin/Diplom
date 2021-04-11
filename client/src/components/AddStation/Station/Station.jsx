@@ -12,14 +12,19 @@ import Pin from 'leaflet/dist/images/marker-icon-2x.png';
 import Shadow from 'leaflet/dist/images/marker-shadow.png';
 import SaveEcoBot from '../../../img/SaveEcoBot.png';
 import OwnImg from '../../../img/own.png';
-import {useDispatch} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {
   changeStatusStation,
   deleteStation,
 } from '../../../redux/features/stationsSlice';
+import {
+  addStation,
+  selectSuccsess,
+} from '../../../redux/features/addStationSlice';
 
 function Station({station}) {
   const dot = [station.Latitude, station.Longitude];
+  const success = useSelector(selectSuccsess);
 
   const dispatch = useDispatch();
 
@@ -40,6 +45,23 @@ function Station({station}) {
           backgroundColor: 'rgb(125, 238, 20)',
         }
       : {};
+
+  function info() {
+    Modal.info({
+      title: 'This station will be added to your station list',
+      onOk() {
+        dispatch(addStation(station.ID_SaveEcoBot));
+      },
+      centered: true,
+      closable: true,
+    });
+  }
+
+  function successs() {
+    Modal.success({
+      content: 'Station added',
+    });
+  }
 
   return (
     <div className={s.station}>
@@ -72,7 +94,9 @@ function Station({station}) {
           </div>
           {/* <div className={s.stationInfoValues}>{station?.units?.join(',')}</div> */}
           <div className={s.stationInfoView}>
-            <Button type='primary'>Add</Button>
+            <Button type='primary' onClick={info}>
+              Add
+            </Button>
           </div>
         </div>
       </div>

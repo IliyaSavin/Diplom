@@ -116,4 +116,18 @@ export const stationsAPI = {
         },
       })
       .then((response) => response.data),
+  addStation: (id) =>
+    instance
+      .post(
+        `station/addStationEcoBot`,
+        {
+          id_SaveEcoBot: id,
+        },
+        {
+          headers: {
+            'x-auth-token': sessionStorage.getItem('token'),
+          },
+        }
+      )
+      .then((response) => response.data),
 };

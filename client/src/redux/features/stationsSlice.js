@@ -8,6 +8,7 @@ const initialState = {
   loading: false,
   currentPageIndex: ['1'],
   loadingStatus: false,
+  page: 1,
 };
 
 export const stationsSlice = createSlice({
@@ -70,6 +71,12 @@ export const stationsSlice = createSlice({
         loadingStatus: action.payload,
       };
     },
+    setPage: (state, action) => {
+      return {
+        ...state,
+        page: action.payload,
+      };
+    },
   },
 });
 
@@ -82,6 +89,7 @@ export const {
   setAdminConfig,
   setGlobalStatus,
   setLoadingStatus,
+  setPage,
 } = stationsSlice.actions;
 
 //@Thunks
@@ -131,5 +139,6 @@ export const selectCurrentPageIndex = (state) =>
 export const selectLoading = (state) => state.stations.loading;
 export const selectConfig = (state) => state.stations.config;
 export const selectLoadingStaus = (state) => state.stations.loadingStatus;
+export const selectPage = (state) => state.stations.page;
 
 export default stationsSlice.reducer;

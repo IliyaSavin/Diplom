@@ -33,6 +33,12 @@ export const addStationSlice = createSlice({
         cityList: action.payload,
       };
     },
+    setSuccess: (state, action) => {
+      return {
+        ...state,
+        success: action.payload,
+      };
+    },
   },
 });
 
@@ -41,16 +47,29 @@ export const {
   setLoading,
   setPage,
   setCityList,
+  setSuccess,
 } = addStationSlice.actions;
 
 //@Thunks
 export const getEcoBotStations = (string) => async (dispatch) => {
   dispatch(setLoading(true));
   const data = await stationsAPI.getAllStationsEcoBot(string);
-  const city = await stationsAPI.getCityListEcoBot();
-  dispatch(setCityList(city));
   dispatch(setAllStationsEco(data));
   dispatch(setLoading(false));
+};
+
+export const getCityList = () => async (dispatch) => {
+  dispatch(setLoading(true));
+  const city = await stationsAPI.getCityListEcoBot();
+  dispatch(setCityList(city));
+  dispatch(setLoading(false));
+};
+
+export const addStation = (id) => async (dispatch) => {
+  const data = await stationsAPI.addStation(id);
+  if (data.msg === 'Station added') {
+    dispatch(setSuccess(true));
+  }
 };
 
 // @SELECTORS
@@ -58,6 +77,7 @@ export const getEcoBotStations = (string) => async (dispatch) => {
 export const selectAllStationEcoBot = (state) => state.addStation.allStations;
 export const selectIsLoading = (state) => state.addStation.isLoading;
 export const selectPage = (state) => state.addStation.page;
+export const selectSuccsess = (state) => state.addStation.success;
 export const selectCityList = (state) => state.addStation.cityList;
 
 export default addStationSlice.reducer;

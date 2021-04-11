@@ -7,12 +7,13 @@ import {
   selectPage,
   setPage,
   selectCityList,
+  getCityList,
 } from '../../redux/features/addStationSlice';
 import {setCurrentPageIndex} from '../../redux/features/stationsSlice';
 import Loader from '../Loader/Loader';
 import Station from './Station/Station';
 import s from './AddStation.module.sass';
-import {Input, Select, Switch, Pagination} from 'antd';
+import {Input, Select, Switch, Pagination, Modal} from 'antd';
 
 const {Search} = Input;
 const {Option} = Select;
@@ -30,14 +31,27 @@ function AddStation() {
 
   useEffect(() => {
     dispatch(setCurrentPageIndex(['3']));
-    cityList &&
-      dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
+    dispatch(getCityList());
   }, []);
 
   useEffect(() => {
     cityList &&
       dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
+  }, [cityList]);
+
+  useEffect(() => {
+    if (cityList !== undefined) {
+      let string = searchValue
+        ? `?searchString=${searchValue}&city=${cityList[selectedCityIndex]}`
+        : `?city=${cityList[selectedCityIndex]}`;
+      cityList && dispatch(getEcoBotStations(string));
+    }
   }, [selectedCityIndex]);
+
+  useEffect(() => {
+    if (!searchValue && cityList !== undefined)
+      dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
+  }, [searchValue]);
 
   let portionStation = allStations?.slice(page * 10 - 10, page * pageSize);
 
@@ -46,9 +60,14 @@ function AddStation() {
       portionStation = allStations.slice(page * 10 - 10, page * pageSize);
     }
   }, [page]);
-  console.log(portionStation);
 
-  const onSearch = (value) => {};
+  const onSearch = (value) => {
+    setSearchValue(value);
+    let string = searchValue
+      ? `?searchString=${value}&city=${cityList[selectedCityIndex]}`
+      : `?city=${cityList[selectedCityIndex]}`;
+    dispatch(getEcoBotStations(string));
+  };
   const handleChangeSelect = (value) => {};
   const onChangePage = (page, pageSize) => {
     dispatch(setPage(page));
@@ -98,6 +117,7 @@ function AddStation() {
           defaultCurrent={page}
           total={allStations?.length}
           onChange={onChangePage}
+          showSizeChanger={false}
         />
       </div>
     </div>
