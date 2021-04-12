@@ -13,8 +13,16 @@ router.post('/addUser', auth, async (req, res) => {
         request = new Request(`CREATE LOGIN ${login} WITH PASSWORD = '${password}'; `, function(err, rowCount, rows) {
             connection.close();
             if (err) {
-                console.log(err);
-                res.status(500).send('Server error');
+                //console.log(err.message);
+                if (err.message.includes("already exists")) {
+                    res.json({
+                        message: "login already exists"
+                    })
+                } else {
+                    res.json({
+                        message: "password error"
+                    })
+                }
             } else {
                 createUserForLogin(login);
                 res.json({
