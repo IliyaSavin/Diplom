@@ -115,6 +115,7 @@ router.get('/system/', auth, async (req, res) => {
             orderStr = " order by ID_Station DESC";
         }
 
+
         request = new Request(requestStr + orderStr, function(err, rowCount, rows) {
             connection.close();
             if (err) {
@@ -148,6 +149,7 @@ router.get('/ecoBot/', auth, async (req, res) => {
             var searchCity = "";
             if (url.searchString != undefined) searchFor = url.searchString;
             if (url.city != undefined) searchCity = url.city;
+            if (searchCity == "All") searchCity = "";
             if (searchIn.includes(searchFor) && station.cityName.includes(searchCity)) {
                 var newStation = {
                     ID_SaveEcoBot: station.id,
