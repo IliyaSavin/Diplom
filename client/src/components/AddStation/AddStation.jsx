@@ -61,6 +61,13 @@ function AddStation() {
     }
   }, [page]);
 
+  useEffect(() => {
+    if (allStations !== undefined) {
+      portionStation = allStations.slice(page * 10 - 10, page * pageSize);
+      dispatch(setPage(1));
+    }
+  }, [allStations]);
+
   const onSearch = (value) => {
     setSearchValue(value);
     let string = searchValue
@@ -77,6 +84,8 @@ function AddStation() {
   const onChangeSelect = (value) => {
     setSelectedCityIndex(value);
   };
+
+  console.log(portionStation);
 
   if (isLoading) return <Loader />;
 
@@ -103,7 +112,9 @@ function AddStation() {
               defaultValue={selectedCityIndex}
             >
               {cityList?.map((c, index) => (
-                <Option value={index}>{c}</Option>
+                <Option key={index} value={index}>
+                  {c}
+                </Option>
               ))}
             </Select>
           </div>
@@ -111,7 +122,9 @@ function AddStation() {
       </div>
       <div className={s.stationWrapper}>
         {portionStation !== undefined &&
-          portionStation.map((s) => <Station station={s} />)}
+          portionStation.map((s) => (
+            <Station key={s.ID_SaveEcoBot} station={s} />
+          ))}
         <Pagination
           className={s.pagination}
           defaultCurrent={page}

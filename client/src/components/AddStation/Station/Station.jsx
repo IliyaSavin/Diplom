@@ -69,7 +69,7 @@ function Station({station}) {
       <div className={s.stationMap}>
         <MapContainer
           center={dot}
-          zoom={8}
+          zoom={12}
           scrollWheelZoom={false}
           style={{maxWidth: 300, width: '100%', height: 200}}
         >
@@ -84,14 +84,19 @@ function Station({station}) {
           <div className={s.stationInfoId}>
             ID Station: {station.ID_SaveEcoBot}
           </div>
+
           <div className={s.stationInfoName}>{station.Name}</div>
         </div>
         <div className={s.stationInfoBottom}>
-          <div className={s.stationInfoSave}>
+          <div
+            className={s.stationInfoSave}
+            style={{display: 'flex', alignItems: 'center'}}
+          >
             <img
               src={station.ID_SaveEcoBot ? SaveEcoBot : OwnImg}
               className={s.stationInfoLogo}
             />
+            <div>{station.Сity}</div>
           </div>
           {/* <div className={s.stationInfoValues}>{station?.units?.join(',')}</div> */}
           <div className={s.stationInfoView}>

@@ -1,5 +1,6 @@
 import React, {useEffect} from 'react';
 import './LoginPage.sass';
+import Logo from '../../img/logo.png';
 
 import {Form, Input, Button} from 'antd';
 import {Redirect} from 'react-router-dom';
@@ -57,6 +58,10 @@ const LoginPage = React.memo(({history}) => {
   if (auth) return <Redirect to={'/'} />;
   return (
     <div className={'login'}>
+      <div className={'logoWrapper'}>
+        <img src={Logo} alt='' />
+        <p>Admin</p>
+      </div>
       <Form
         {...layout}
         name='basic'

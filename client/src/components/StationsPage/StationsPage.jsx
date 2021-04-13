@@ -44,6 +44,10 @@ function StationsPage() {
   }, []);
 
   useEffect(() => {
+    dispatch(setPage(1));
+  }, [stations]);
+
+  useEffect(() => {
     if (!searchValue) dispatch(getStations(`?order=${sortValue}`));
   }, [searchValue]);
 

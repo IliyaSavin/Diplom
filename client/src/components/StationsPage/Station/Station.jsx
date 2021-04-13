@@ -100,7 +100,7 @@ function Station({station, sortValue}) {
             <Button type='primary' onClick={changeStatus}>
               Change Status
             </Button>
-            <Button type='primary' danger on onClick={warning}>
+            <Button type='primary' danger onClick={warning}>
               Delete
             </Button>
           </div>
