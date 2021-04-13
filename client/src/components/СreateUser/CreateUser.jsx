@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
   selectLogin,
@@ -8,6 +8,7 @@ import {
   setLogin,
   setPassword,
   addUser,
+  setSuccess,
 } from '../../redux/features/userSlice';
 import s from './CreateUser.module.sass';
 import {Form, Input, Button, Modal} from 'antd';
@@ -21,10 +22,17 @@ function CreateUser() {
   const errors = useSelector(selectErrors);
   const successs = useSelector(selectSuccess);
 
+  const ref = useRef(null);
+
+  const [closed, setClosed] = useState(false);
+
   function success() {
     Modal.success({
       content: 'User Added',
       centered: true,
+      onOk() {
+        setClosed(true);
+      },
     });
   }
 
@@ -33,7 +41,21 @@ function CreateUser() {
   }, [successs]);
 
   useEffect(() => {
+    if (closed && successs) {
+      dispatch(setLogin(''));
+      dispatch(setPassword(''));
+      dispatch(setSuccess(undefined));
+    }
+  }, [closed]);
+
+  useEffect(() => {
     dispatch(setCurrentPageIndex(['2']));
+
+    return () => {
+      dispatch(setSuccess(undefined));
+      dispatch(setLogin(''));
+      dispatch(setPassword(''));
+    };
   }, []);
 
   const layout = {
@@ -47,6 +69,7 @@ function CreateUser() {
   const onFinish = (values) => {
     console.log('Success:', values);
     dispatch(addUser(login, password));
+    ref.current.resetFields();
   };
 
   const validator = async (rule, value) => {
@@ -60,7 +83,9 @@ function CreateUser() {
   return (
     <div className={s.createUser}>
       <h2>Create User</h2>
+      <div className={s.errors}>{errors}</div>
       <Form
+        ref={ref}
         {...layout}
         name='basic'
         initialValues={{remember: true}}
@@ -73,6 +98,7 @@ function CreateUser() {
           rules={[{required: true, message: 'Please input username!'}]}
         >
           <Input
+            style={{width: 305}}
             value={login}
             onChange={(e) => dispatch(setLogin(e.target.value))}
           />
@@ -91,13 +117,14 @@ function CreateUser() {
           ]}
         >
           <Input.Password
+            style={{width: 305}}
             value={password}
             onChange={(e) => dispatch(setPassword(e.target.value))}
           />
         </Form.Item>
 
         <Form.Item {...tailLayout}>
-          <Button type='primary' htmlType='submit' style={{width: 100 + '%'}}>
+          <Button type='primary' htmlType='submit' style={{width: 305}}>
             Create User
           </Button>
         </Form.Item>

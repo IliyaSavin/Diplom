@@ -46,8 +46,8 @@ export const addUser = (login, password) => async (dispatch) => {
   const data = await userAPI.addUser(login, password);
   if (data.login && data.password) {
     dispatch(setSuccess(true));
-    dispatch(setLogin(''));
-    dispatch(setPassword(''));
+  } else if (data.message) {
+    dispatch(setErrors(data.message));
   }
 };
 

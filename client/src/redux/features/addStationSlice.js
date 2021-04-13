@@ -60,7 +60,8 @@ export const getEcoBotStations = (string) => async (dispatch) => {
 
 export const getCityList = () => async (dispatch) => {
   dispatch(setLoading(true));
-  const city = await stationsAPI.getCityListEcoBot();
+  let city = await stationsAPI.getCityListEcoBot();
+  city.unshift('All');
   dispatch(setCityList(city));
   dispatch(setLoading(false));
 };

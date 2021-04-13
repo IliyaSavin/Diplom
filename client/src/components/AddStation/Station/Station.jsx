@@ -16,6 +16,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {
   changeStatusStation,
   deleteStation,
+  setGlobalStatus,
 } from '../../../redux/features/stationsSlice';
 import {
   addStation,
@@ -68,7 +69,7 @@ function Station({station}) {
       <div className={s.stationMap}>
         <MapContainer
           center={dot}
-          zoom={9}
+          zoom={8}
           scrollWheelZoom={false}
           style={{maxWidth: 300, width: '100%', height: 200}}
         >
