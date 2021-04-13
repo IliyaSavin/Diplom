@@ -98,7 +98,7 @@ const LoginPage = React.memo(({history}) => {
             size={'large'}
             style={{width: '187px', marginTop: '10px'}}
           >
-            Submit
+            Log in
           </Button>
         </Form.Item>
       </Form>
