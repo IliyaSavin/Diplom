@@ -117,7 +117,8 @@ var saveEcoBotMeasurmentUnitId = {
   'PM10': 2,
   'PM2.5': 3,
   'Temperature': 6,
-  'Air Quality Index': 9
+  'Air Quality Index': 9,
+  'Pressure': 5
 }
 
 async function getMeasurementsBot() {
