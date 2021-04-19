@@ -7,14 +7,12 @@ const xl = require('excel4node');
 
 router.post('/addUser', auth, async (req, res) => {
     const {login, password} = req.body;
-    var result = {};
     var connection = new Connection(config.master);
     connection.connect();
     connection.on('connect', function(err) {
         request = new Request(`CREATE LOGIN ${login} WITH PASSWORD = '${password}'; `, function(err, rowCount, rows) {
             connection.close();
             if (err) {
-                //console.log(err.message);
                 if (err.message.includes("already exists")) {
                     res.json({
                         message: "Login already exists"
@@ -108,7 +106,7 @@ router.get('/activityLog/', auth, async (req, res) => {
         var all = [];
         let requestStr = `SELECT event_time, sys.fn_get_audit_file.action_id, name, succeeded, server_principal_name, statement, additional_information, client_ip, duration_milliseconds FROM sys.fn_get_audit_file
                             (
-                            'https://ecoaudit.blob.core.windows.net/sqldbauditlogs/ecosensors/EcoSensorsAzure/SqlDbAuditing_Audit_NoRetention/', default, default
+                            'https://ecoaudit.blob.core.windows.net/sqldbauditlogs/ecosensors/EcoSensorsAzure/SqlDbAuditing_Audit/', default, default
                             ) inner join sys.dm_audit_actions ON sys.fn_get_audit_file.action_id = sys.dm_audit_actions.action_id`;
         let orderStr = "";
         let userStr = "";

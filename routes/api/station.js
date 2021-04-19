@@ -115,7 +115,6 @@ router.get('/system/', auth, async (req, res) => {
             orderStr = " order by ID_Station DESC";
         }
 
-
         request = new Request(requestStr + orderStr, function(err, rowCount, rows) {
             connection.close();
             if (err) {

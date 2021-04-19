@@ -66,7 +66,7 @@ client.on('message', function (topic, message) {
 // Do your operations
 
 
-  if (topic.toString() == ('monitor/dev05/' + measurmentList[currentParametrCount])) {
+  if (topic.toString() == ('monitor/dev10/' + measurmentList[currentParametrCount])) {
     tempMeasurment[measurmentList[currentParametrCount]] = message.toString();
     currentParametrCount++;
   }
