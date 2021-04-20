@@ -75,7 +75,6 @@ function AddStation() {
       : `?city=${cityList[selectedCityIndex]}`;
     dispatch(getEcoBotStations(string));
   };
-  const handleChangeSelect = (value) => {};
   const onChangePage = (page, pageSize) => {
     dispatch(setPage(page));
     window.scrollTo(0, 0);
@@ -106,7 +105,6 @@ function AddStation() {
           <div>
             <Select
               style={{width: 170}}
-              onChange={handleChangeSelect}
               className={s.select}
               onChange={onChangeSelect}
               defaultValue={selectedCityIndex}

@@ -9,6 +9,7 @@ import CreateUser from '../СreateUser/CreateUser';
 import {selectCurrentPageIndex} from '../../redux/features/stationsSlice';
 import AddStation from '../AddStation/AddStation';
 import s from './LayoutApp.module.sass';
+import Logs from '../Logs/Logs';
 
 const {SubMenu} = Menu;
 const {Content, Sider} = Layout;
@@ -46,6 +47,9 @@ const LayoutApp = () => {
                 <Link to='/addstation'>Add Station</Link>
               </Menu.Item>
               <Menu.Item key='4'>
+                <Link to='/logs'>Activity Logs</Link>
+              </Menu.Item>
+              <Menu.Item key='5'>
                 <Button
                   type='primary'
                   danger
@@ -74,6 +78,7 @@ const LayoutApp = () => {
               <Route exact path='/' component={StationsPage} />
               <Route exact path='/createuser' component={CreateUser} />
               <Route exact path='/addstation' component={AddStation} />
+              <Route exact path='/logs' component={Logs} />
             </Switch>
           </Content>
         </Layout>

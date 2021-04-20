@@ -27,6 +27,26 @@ export const userAPI = {
       .then((response) => response.data),
 };
 
+export const logsAPI = {
+  getAllUsers: () =>
+    instance
+      .get('admin/users', {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+
+  getAllLogs: (string) =>
+    instance
+      .get(`admin/activityLog${string}`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+};
+
 export const stationsAPI = {
   getAllStations: (string) =>
     instance
