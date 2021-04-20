@@ -30,8 +30,9 @@ const columns = [
     title: 'Time',
     dataIndex: 'event_time',
     key: 'event_time',
+    align: 'center',
     render: (text) => {
-      var dateFormat = 'YYYY-MM-DD';
+      var dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
       return <b>{moment(text, dateFormat).format(dateFormat)}</b>;
     },
@@ -40,21 +41,37 @@ const columns = [
     title: 'Action',
     dataIndex: 'action_id',
     key: 'action_id',
+    align: 'center',
   },
   {
     title: 'Succeeded',
     dataIndex: 'succeeded',
     key: 'succeeded',
+    align: 'center',
+    render: (text) => {
+      return (
+        <div className={s.wrap}>
+          <div type={`${text}`} className={s.succeeded}></div>
+        </div>
+      );
+    },
   },
   {
     title: 'User name',
     key: 'server_principal_name',
     dataIndex: 'server_principal_name',
+    align: 'center',
   },
   {
     title: 'Statement',
     key: 'statement',
     dataIndex: 'statement',
+
+    render: (text, record) => (
+      <div style={{wordWrap: 'break-word', wordBreak: 'break-word'}}>
+        {text}
+      </div>
+    ),
   },
   {
     title: 'Additional information',
@@ -65,11 +82,13 @@ const columns = [
     title: 'Client IP',
     key: 'client_ip',
     dataIndex: 'client_ip',
+    align: 'center',
   },
   {
     title: 'Duration',
     key: 'duration_milliseconds',
     dataIndex: 'duration_milliseconds',
+    align: 'center',
   },
 ];
 
@@ -109,8 +128,9 @@ function Logs() {
   const [order, setOrder] = useState('Up');
   const [onlyErrors, setOnlyErrors] = useState(false);
   const [searchString, setSearchString] = useState('');
+  const [nextLoad, setNextLoad] = useState(false);
 
-  var dateFormat = 'YYYY-MM-DD';
+  var dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
   const [dateEnd, setDateEnd] = useState(moment(new Date(), dateFormat));
   const [dateStart, setDateStart] = useState(
@@ -118,10 +138,14 @@ function Logs() {
   );
 
   const parseSearch = () => {
-    const searchStr = searchString ? `&${searchString}` : '';
-    const string = `?order=${order}${searchStr}&onlyErrors=${onlyErrors}&dateFrom=${dateStart.format(
-      dateFormat
-    )}&dateTo=${dateEnd.format(dateFormat)}`;
+    const searchStr = searchString ? `&searchString=${searchString}` : '';
+    let string = '';
+    if (allUsers?.length > 0) {
+      string = `?order=${order}${searchStr}&onlyErrors=${onlyErrors}&dateFrom=${dateStart.format(
+        dateFormat
+      )}&dateTo=${dateEnd.format(dateFormat)}&user=${allUsers[selectedUser]}`;
+    }
+
     console.log(string);
     // history.push('/logs/' + string);
     return string;
@@ -133,13 +157,36 @@ function Logs() {
     dispatch(setCurrentPageIndex(['4']));
     dispatch(getAllUsers());
     dispatch(getAllData(parseSearch()));
+    setNextLoad(true);
   }, []);
+
+  useEffect(() => {
+    if (nextLoad) {
+      dispatch(getAllData(parseSearch()));
+    }
+  }, [dateStart, dateEnd]);
+
+  useEffect(() => {
+    if (nextLoad) {
+      dispatch(getAllData(parseSearch()));
+    }
+  }, [onlyErrors]);
+
+  useEffect(() => {
+    if (nextLoad) {
+      dispatch(getAllData(parseSearch()));
+    }
+  }, [order]);
+
+  useEffect(() => {
+    if (nextLoad) {
+      dispatch(getAllData(parseSearch()));
+    }
+  }, [selectedUser]);
 
   const onChange = (date, dateString) => {
     setDateStart(moment(dateString[0], dateFormat));
     setDateEnd(moment(dateString[1], dateFormat));
-
-    dispatch(getAllData(parseSearch()));
   };
 
   if (loading) return <Loader />;
@@ -150,9 +197,10 @@ function Logs() {
         <div className={s.wrappers_function}>
           <Search
             placeholder='Action ID or Statement'
-            onSearch={() => {}}
             value={searchString}
             enterButton
+            onChange={(e) => setSearchString(e.currentTarget.value)}
+            onSearch={() => dispatch(getAllData(parseSearch()))}
           />
         </div>
         <div className={s.wrappers_function}>
@@ -161,6 +209,7 @@ function Logs() {
             style={{width: 170}}
             className={s.select}
             defaultValue={selectedUser}
+            onChange={(value) => setSelectedUser(value)}
           >
             {allUsers?.map((u, index) => (
               <Option key={index} value={index}>
@@ -174,16 +223,25 @@ function Logs() {
             defaultValue={[dateStart, dateEnd]}
             format={dateFormat}
             onChange={onChange}
+            showTime
           />
         </div>
         <div className={s.wrappers_function}>
-          <Checkbox checked={onlyErrors} onChange={() => {}}>
+          <Checkbox
+            checked={onlyErrors}
+            onChange={() => setOnlyErrors(!onlyErrors)}
+          >
             Only Errors
           </Checkbox>
         </div>
         <div className={s.wrappers_function}>
           Order:{' '}
-          <Select style={{width: 80}} className={s.select} defaultValue={order}>
+          <Select
+            style={{width: 80}}
+            className={s.select}
+            defaultValue={order}
+            onChange={(value) => setOrder(value)}
+          >
             <Option value='Up'>Up</Option>
             <Option value='Down'>Down</Option>
           </Select>

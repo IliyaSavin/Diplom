@@ -41,6 +41,7 @@ export const getAllUsers = () => async (dispatch) => {
 
 export const getAllData = (string) => async (dispatch) => {
   dispatch(setLoading(true));
+  dispatch(setAllLogs([]));
   let data = await logsAPI.getAllLogs(string);
   dispatch(setAllLogs(data));
   dispatch(setLoading(false));
