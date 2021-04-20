@@ -114,7 +114,7 @@ router.get('/activityLog/', auth, async (req, res) => {
         let searchStr = "";
 
         if (url.user) {
-            userStr = ` WHERE server_principal_name='${url.user}'`;
+            if (url.user != "All") userStr = ` WHERE server_principal_name='${url.user}'`;
         }
 
         if (url.onlyErrors) {
@@ -156,29 +156,6 @@ router.get('/activityLog/', auth, async (req, res) => {
             orderStr = " ORDER BY event_time DESC";
         }
 
-
-        /*let dateFrom = new Date(url.dateFrom);
-        let currentDate = new Date();
-        let dateTo = new Date(url.dateTo);
-
-        if (url.dateFrom && url.dateTo) {
-            dateFrom = new Date(url.dateFrom);
-            dateTo = new Date(url.dateTo);
-        } else if (url.dateFrom && !url.dateTo) {
-            dateFrom = new Date(url.dateFrom);
-            dateTo = new Date();
-        } else {
-            dateFrom = new Date("2021-04-12");
-            dateTo = new Date();
-        }
-        let Difference_In_Time = dateTo.getTime() - dateFrom.getTime();
-        let Difference_In_Days = Difference_In_Time / (1000 * 3600 * 24);
-
-        for (var i = 0; i < 40; i++) {
-            currentDate.setDate(currentDate.getDate() + 1);
-        }*/
-        
-        
         request = new Request(requestStr + whereStr + orderStr, function(err, rowCount, rows) {
             connection.close();
             if (err) {

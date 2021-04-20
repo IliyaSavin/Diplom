@@ -59,14 +59,17 @@ var tempMeasurment = {};
 var lastUpdate = new Date();
 client.on('message', function (topic, message) {
   // message is Buffer
-  console.log(topic.toString());
-  console.log(message.toString());
+  if (topic.toString().includes('dev05')) {
+    console.log(topic.toString());
+    console.log(message.toString());
+  }
+  
 
   
 // Do your operations
 
 
-  if (topic.toString() == ('monitor/dev10/' + measurmentList[currentParametrCount])) {
+  if (topic.toString() == ('monitor/dev05/' + measurmentList[currentParametrCount])) {
     tempMeasurment[measurmentList[currentParametrCount]] = message.toString();
     currentParametrCount++;
   }
