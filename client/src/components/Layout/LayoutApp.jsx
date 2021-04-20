@@ -10,6 +10,7 @@ import {selectCurrentPageIndex} from '../../redux/features/stationsSlice';
 import AddStation from '../AddStation/AddStation';
 import s from './LayoutApp.module.sass';
 import Logs from '../Logs/Logs';
+import Report from '../Report/Report';
 
 const {SubMenu} = Menu;
 const {Content, Sider} = Layout;
@@ -50,6 +51,9 @@ const LayoutApp = () => {
                 <Link to='/logs'>Activity Logs</Link>
               </Menu.Item>
               <Menu.Item key='5'>
+                <Link to='/report'>Report</Link>
+              </Menu.Item>
+              <Menu.Item key='6'>
                 <Button
                   type='primary'
                   danger
@@ -79,6 +83,7 @@ const LayoutApp = () => {
               <Route exact path='/createuser' component={CreateUser} />
               <Route exact path='/addstation' component={AddStation} />
               <Route exact path='/logs' component={Logs} />
+              <Route exact path='/report' component={Report} />
             </Switch>
           </Content>
         </Layout>
