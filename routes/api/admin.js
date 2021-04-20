@@ -118,9 +118,9 @@ router.get('/activityLog/', auth, async (req, res) => {
         }
 
         if (url.onlyErrors) {
-            if (userStr == "") {
+            if (userStr == "" && url.onlyErrors != "false") {
                 errorStr = "  WHERE succeeded=0";
-            } else {
+            } else if (url.onlyErrors != "false") {
                 errorStr = " and succeeded=0";
             }
         }
