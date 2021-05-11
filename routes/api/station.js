@@ -39,20 +39,13 @@ router.post('/addStationEcoBot', auth, async (req, res) => {
 })
 
 router.post('/addStation', auth, async (req, res) => {
-    const {city, name, id_SaveEcoBot, id_server, longitude, latitude} = req.body;
-    var result = {};
-    var typeStr = "";
-    if (id_SaveEcoBot) {
-        typeStr = `@id_SaveEcoBot = '${id_SaveEcoBot}'`;
-    } else if (id_server) {
-        typeStr = `@id_server = '${id_server}'`;
-    }
+    const {city, name, id_server, longitude, latitude} = req.body;
     var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
         request = new Request(`EXEC Add_Station @city = '${city}',
                                 @name = '${name}',
-                                ${typeStr},
+                                @id_server = '${id_server}',
                                 @longitude = ${longitude},
                                 @latitude = ${latitude} `, function(err, rowCount, rows) {
             connection.close();
@@ -67,6 +60,113 @@ router.post('/addStation', auth, async (req, res) => {
     })
 })
 
+router.post('/changeMessageUnit', auth, async (req, res) => {
+    const {ID_Station, ID_Measured_Unit, Message, Queue_Number} = req.body;
+
+    var messageStr = '';
+    var queueStr = '';
+
+    if (Message) {
+        messageStr = `Message = '${Message}'`;
+    }
+    if (Queue_Number) {
+        if (messageStr != '') {
+            queueStr = `, Queue_Number = ${Queue_Number}`;
+        } else {
+            queueStr = `Queue_Number = ${Queue_Number}`;
+        }
+    }
+
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        request = new Request(
+            `if exists (select * from MQTT_Message_Unit where ID_Station = '${ID_Station}' and ID_Measured_Unit = ${ID_Measured_Unit})
+                update MQTT_Message_Unit
+                set ${messageStr} ${queueStr}
+                where ID_Station = '${ID_Station}' and ID_Measured_Unit = ${ID_Measured_Unit}
+            else
+                INSERT INTO MQTT_Message_Unit(ID_Station, ID_Measured_Unit, Message, Queue_Number) VALUES ('${ID_Station}', ${ID_Measured_Unit}, '${Message}', ${Queue_Number});`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json({ msg: 'Message Unit changed'});
+            }
+        })
+    connection.execSql(request);
+    })
+})
+
+router.post('/deleteMessageUnit', auth, async (req, res) => {
+    const {ID_Station, ID_Measured_Unit} = req.body;
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        request = new Request(`delete from MQTT_Message_Unit where ID_Station = '${ID_Station}' and ID_Measured_Unit = ${ID_Measured_Unit}; `, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json({ msg: 'Message Unit deleted'});
+            }
+        })
+    connection.execSql(request);
+    })
+})
+
+router.get('/getMessageUnitList', auth, async (req, res) => {
+    var url = req.query;
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var all = [];
+        request = new Request(`select ID_Station, MQTT_Message_Unit.ID_Measured_Unit, Message, Title, Unit, Queue_Number from MQTT_Message_Unit inner join Measured_Unit on MQTT_Message_Unit.ID_Measured_Unit = Measured_Unit.ID_Measured_Unit where ID_Station = '${url.ID_Station}';`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json(all);
+            }
+        })
+        request.on("row", columns => {
+            var row = {};
+            columns.forEach(column => {
+              row[column.metadata.colName] = column.value;
+            });
+            all.push(row);
+          });
+    connection.execSql(request);
+    })
+})
+
+router.get('/unitsAll', auth, async (req, res) => {
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var all = [];
+        request = new Request(`select * from Measured_Unit`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json(all);
+            }
+        })
+        request.on("row", columns => {
+            var row = {};
+            columns.forEach(column => {
+              row[column.metadata.colName] = column.value;
+            });
+            all.push(row);
+          });
+    connection.execSql(request);
+    })
+})
 
 router.post('/status', auth, async (req, res) => {
     const {id, status} = req.body;
@@ -88,6 +188,32 @@ router.post('/status', auth, async (req, res) => {
         });
         connection.execSql(request);
     });
+})
+
+router.get('/getMqttStationList', auth, async (req, res) => {
+    var url = req.query;
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var all = [];
+        request = new Request(`select * from Station where ID_Server = 1;`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err);
+                res.status(500).send('Server error');
+            } else {
+                res.json(all);
+            }
+        })
+        request.on("row", columns => {
+            var row = {};
+            columns.forEach(column => {
+              row[column.metadata.colName] = column.value;
+            });
+            all.push(row);
+          });
+    connection.execSql(request);
+    })
 })
 
 

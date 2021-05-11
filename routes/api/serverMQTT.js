@@ -26,14 +26,22 @@ router.post('/status', auth, async (req, res) => {
     });
 })
 
-router.get('/', auth, async (req, res) => {
-    var connection = new Connection(config.ecoSensors);
+router.get('/messages/', auth, async (req, res) => {
+    var url = req.query;
+    var connection = new Connection(config.user(req.user));
     connection.connect();
     connection.on('connect', function(err) {
         var all = [];
-        request = new Request("select * from MQTT_Server", function(err, rowCount, rows) {
+        let requestStr = "select * from Server_Message order by Message_Date";
+
+        if (url.searchString) {
+            requestStr = `select * from Server_Message where Topic like '%${url.searchString}%' order by Message_Date`;
+        }
+
+        request = new Request(requestStr, function(err, rowCount, rows) {
             connection.close();
             if (err) {
+                console.log(err);
                 res.status(500).send('Server error');
             } else {
                 res.json(all);
@@ -42,9 +50,32 @@ router.get('/', auth, async (req, res) => {
         request.on("row", columns => {
             var row = {};
             columns.forEach(column => {
-              row[column.metadata.colName] = column.value;
+              row[column.metadata.colName] = column.value.toString().trim();
             });
             all.push(row);
+          });
+        connection.execSql(request);
+    })
+});
+
+router.get('/', auth, async (req, res) => {
+    var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var row = {};
+        request = new Request("select * from MQTT_Server where ID_Server = 1", function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                res.status(500).send('Server error');
+            } else {
+                res.json(row);
+            }
+        });
+        request.on("row", columns => {
+            columns.forEach(column => {
+              row[column.metadata.colName] = column.value;
+            });
+            //all.push(row);
           });
         connection.execSql(request);
     })

@@ -36,6 +36,14 @@ client.on('connect', function () {
   })
 })
 
+var MqttMessageList = [];
+
+getMqttStationList()
+setInterval(() => getMqttStationList(), 10000);
+setInterval(() => getMqttMessageList(), 10000);
+
+//setInterval(() => console.log(MqttMessageList), 1000);
+
 var workingStatus = 0;
 
 setInterval(() => checkWorkingStatus(), 10000);
@@ -59,6 +67,7 @@ var tempMeasurment = {};
 var lastUpdate = new Date();
 client.on('message', function (topic, message) {
   // message is Buffer
+  insertServerMessage(topic.toString(), message.toString());
   if (topic.toString().includes('dev05')) {
     console.log(topic.toString());
     console.log(message.toString());
@@ -68,26 +77,26 @@ client.on('message', function (topic, message) {
   
 // Do your operations
 
-
-  if (topic.toString() == ('monitor/dev05/' + measurmentList[currentParametrCount])) {
-    tempMeasurment[measurmentList[currentParametrCount]] = message.toString();
-    currentParametrCount++;
-  }
-
-  if (currentParametrCount >= measurmentList.length) {
-    var currentDate = new Date();
-    var seconds = (currentDate.getTime() - lastUpdate.getTime()) / 1000;
-    if (seconds >= 110) {
-      console.log(tempMeasurment);
-      if (workingStatus == 1) writeMeasurmentMQTT('1001', tempMeasurment, measurmentUnitId);
-      lastUpdate = new Date();
+  MqttMessageList.forEach(station => {
+    if (topic.toString() == (station.measurmentList[station.currentParametrCount])) {
+      station.tempMeasurment[station.measurmentList[station.currentParametrCount]] = message.toString();
+      station.currentParametrCount++;
     }
-    tempMeasurment = {};
-    currentParametrCount = 0;
-  }
-  //console.log(topic.toString())
-  //console.log(message.toString())
-  //client.end()
+  });
+
+  var currentDate = new Date();
+  MqttMessageList.forEach(station => {
+    if (station.currentParametrCount >= station.measurmentList.length) {
+      var seconds = (currentDate.getTime() - lastUpdate.getTime()) / 1000;
+      if (seconds >= 110) {
+        console.log(station.tempMeasurment);
+        if (workingStatus == 1) writeMeasurmentMQTT(station.ID_Station, station.tempMeasurment, station.measurmentUnitId);
+        lastUpdate = new Date();
+      }
+      station.tempMeasurment = {};
+      station.currentParametrCount = 0;
+    }
+  });
 })
 
 // MQTT all Measurments write
@@ -198,6 +207,105 @@ async function checkWorkingStatus() {
     })
 }
 
+async function getMqttStationList() {
+  var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        var all = [];
+        sqlRequest = new Request("select ID_Station from Station where ID_Station like '1%';", function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err)
+            } else {
+                //console.log(`status: ${workingStatus}`);
+            }
+        });
+        sqlRequest.on("row", columns => {
+            if (!checkStation(MqttMessageList, columns[0].value)) {
+              MqttMessageList.push({
+                ID_Station: columns[0].value,
+                measurmentList: [],
+                measurmentUnitId: {},
+                currentParametrCount: 0,
+                tempMeasurment: {}
+              });
+            }
+          });
+        connection.execSql(sqlRequest);
+    })
+}
+
+async function getMqttMessageList() {
+  MqttMessageList.forEach(station => {
+    getMessagesForOneStation(station.ID_Station);
+  })
+}
+
+async function getMessagesForOneStation(ID_Station) {
+  var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        MqttMessageList.forEach(station => {
+          if (station.ID_Station == ID_Station) {
+            station.measurmentList = [];
+            station.measurmentUnitId = {};
+          }
+        })
+        sqlRequest = new Request(`select Message, ID_Measured_Unit from MQTT_Message_Unit where ID_Station = '${ID_Station}' order by Queue_Number`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err)
+            } else {
+                
+            }
+        });
+        sqlRequest.on("row", columns => {
+            if (checkStation(MqttMessageList, ID_Station)) {
+              MqttMessageList.forEach(station => {
+                if (station.ID_Station == ID_Station) {
+                  station.measurmentUnitId[`${columns[0].value}`] = columns[1].value;
+                  station.measurmentList.push(columns[0].value);
+                }
+              })
+            }
+          });
+        connection.execSql(sqlRequest);
+    })
+}
+
+async function insertServerMessage(Topic, Value) {
+  var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        sqlRequest = new Request(`INSERT INTO Server_Message(Topic, Value) VALUES ('${Topic}', '${Value}');`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err)
+            } else {
+                //console.log(`status: ${workingStatus}`);
+            }
+        });
+        connection.execSql(sqlRequest);
+    })
+}
+
+//[ {ID_Station: '1001', measurmentList: [], measurmentUnitId: []}, {}];
+
+
+
+function checkStation(stations, ID_Station) {
+  let find = false;
+  if (stations.length > 0) {
+    stations.forEach(station => {
+      if (station.ID_Station == ID_Station) {
+        find = true;
+      }
+    })
+    return find;
+  } else {
+    return false;
+  }
+}
 
 
 client.on("error",function(error){ console.log("Can't connect"+error)
