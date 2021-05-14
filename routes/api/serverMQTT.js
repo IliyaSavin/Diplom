@@ -50,7 +50,11 @@ router.get('/messages/', auth, async (req, res) => {
         request.on("row", columns => {
             var row = {};
             columns.forEach(column => {
-              row[column.metadata.colName] = column.value.toString().trim();
+                if (column.metadata.colName != "Message_Date") {
+                    row[column.metadata.colName] = column.value.toString().trim();
+                } else {
+                    row[column.metadata.colName] = column.value;
+                }
             });
             all.push(row);
           });
