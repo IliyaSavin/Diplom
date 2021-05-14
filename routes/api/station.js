@@ -110,7 +110,10 @@ router.post('/deleteMessageUnit', auth, async (req, res) => {
                 console.log(err);
                 res.status(500).send('Server error');
             } else {
-                res.json({ msg: 'Message Unit deleted'});
+                res.json({ 
+                    ID_Station: ID_Station,
+                    ID_Measured_Unit: ID_Measured_Unit
+                });
             }
         })
     connection.execSql(request);
