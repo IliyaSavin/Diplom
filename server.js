@@ -64,10 +64,17 @@ var measurmentUnitId = {
 var currentParametrCount = 0;
 var tempMeasurment = {};
 
+var lastTopic = "";
+
 var lastUpdate = new Date();
 client.on('message', function (topic, message) {
   // message is Buffer
-  insertServerMessage(topic.toString(), message.toString());
+  if (lastTopic != topic.toString()) {
+    insertServerMessage(topic.toString(), message.toString());
+  } else {
+    lastTopic = topic.toString();
+  }
+
   if (topic.toString().includes('dev05')) {
     console.log(topic.toString());
     console.log(message.toString());
