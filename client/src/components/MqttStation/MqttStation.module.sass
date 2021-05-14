@@ -15,6 +15,7 @@
     align-items: center
     justify-content: center
     box-shadow: 0px 0px 34px 0px rgba(34, 60, 80, 0.2)
+    padding: 30px
     label
         margin-right: 80px
     button
@@ -24,9 +25,39 @@
     box-shadow: 0px 0px 34px 0px rgba(34, 60, 80, 0.2)
     background-color: #fff
     margin-left: 20px
-    padding: 10px
+    display: flex
+    flex-direction: column
+    justify-content: center
+    div.table_header
+        padding: 10px
+        height: 60px
+        margin-bottom: 20px
+        display: flex
+        box-shadow: 0px 11px 8px 0px rgba(34, 60, 80, 0.2)
+        align-items: center
+        justify-content: space-between
+        div
+            &:first-child
+                flex: 0.4
+            &:nth-child(2)
+                margin-left: 20px
+    div.table
+        padding: 10px
+
 .bottom_content
     flex: 1
     box-shadow: 0px 0px 34px 0px rgba(34, 60, 80, 0.2)
     background-color: #fff
     margin-top: 20px
+    display: flex
+    flex-direction: column
+    .bottom_top
+        width: 100%
+        padding: 10px
+        height: 60px
+        box-shadow: 0px 11px 8px 0px rgba(34, 60, 80, 0.2)
+        display: flex
+        align-items: center
+        margin-bottom: 20px
+    .bottom_table_wrapper
+        height: 100%

@@ -28,7 +28,7 @@ const columns = [
     key: 'Message_Date',
     align: 'center',
     render: (text) => {
-      var dateFormat = 'YYYY-MM-DD HH:mm:ss';
+      var dateFormat = 'HH:mm:ss';
       console.log(text, '--------------');
       let date = new Date(text);
       return <b>{moment(date, dateFormat).format(dateFormat)}</b>;
@@ -43,12 +43,12 @@ function TableMonitoring({searchString}) {
 
   useEffect(() => {
     dispatch(getAllMessages());
-  }, [searchString]);
+  }, []);
 
-  if (isLoading === 'monitoring') return <Loader />;
+  if (isLoading?.monitoring) return <Loader />;
   return (
     <Table
-      pagination={{pageSize: 5, position: ['bottomLeft']}}
+      pagination={{pageSize: 5, position: ['bottomCenter']}}
       columns={columns}
       dataSource={messages}
     />
