@@ -17,6 +17,7 @@ import {
 } from '../../redux/features/mqttSlice';
 import TableMonitoringUnit from './TableMonitoringUnit/TableMonitoringUnit';
 import Loader from '../Loader/Loader';
+import FormAdd from './FormAdd/FormAdd';
 const {Search} = Input;
 const {Option} = Select;
 
@@ -104,7 +105,11 @@ function MqttStation() {
           {selected_mqtt && <TableMonitoringUnit station={selected_mqtt} />}
         </div>
 
-        {!isLoading.units && <div className={s.add_wrapper}></div>}
+        {!isLoading.units && (
+          <div className={s.add_wrapper}>
+            <FormAdd ID_Station={selected_mqtt} />
+          </div>
+        )}
       </div>
     </div>
   );

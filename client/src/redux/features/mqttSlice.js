@@ -65,6 +65,22 @@ export const mqttSlice = createSlice({
         message_unit_list: action.payload,
       };
     },
+    updateMessageUnit: (state, action) => {
+      return {
+        ...state,
+        message_unit_list: [
+          ...state.message_unit_list.filter(
+            (m) => m.ID_Measured_Unit != action.payload.ID_Measured_Unit
+          ),
+        ],
+      };
+    },
+    setAllUnits: (state, action) => {
+      return {
+        ...state,
+        all_units: action.payload,
+      };
+    },
   },
 });
 
@@ -77,6 +93,8 @@ export const {
   updateStatusServer,
   setMqttStations,
   setMessageUnitList,
+  updateMessageUnit,
+  setAllUnits,
 } = mqttSlice.actions;
 
 //@Thunks
@@ -118,6 +136,35 @@ export const getMessageUnitList = (stationID) => async (dispatch) => {
   dispatch(setLoading({units: undefined}));
 };
 
+export const deleteMessageUnit =
+  (ID_Station, ID_Measured_Unit) => async (dispatch) => {
+    dispatch(setLoading({units: true}));
+    let data = await mqttAPI.deleteMessageUnit(ID_Station, ID_Measured_Unit);
+    dispatch(updateMessageUnit(data));
+    console.log(data, '555555555555555555555555555555');
+    dispatch(setLoading({units: undefined}));
+  };
+
+export const getAllUnits = () => async (dispatch) => {
+  dispatch(setLoading({unitsList: true}));
+  let data = await mqttAPI.getAllUnits();
+  dispatch(setAllUnits(data));
+  dispatch(setLoading({unitsList: undefined}));
+};
+
+export const addMessage =
+  (ID_Station, ID_Measured_Unit, Message, Queue_Number) => async (dispatch) => {
+    dispatch(setLoading({units: true}));
+    let data = await mqttAPI.addNewMessage(
+      ID_Station,
+      ID_Measured_Unit,
+      Message,
+      Queue_Number
+    );
+    // dispatch(setAllUnits(data));
+    dispatch(setLoading({units: undefined}));
+  };
+
 // @SELECTORS
 
 export const selectIsLoading = (state) => state.mqtt.isLoading;
@@ -127,5 +174,6 @@ export const selectAllMessages = (state) => state.mqtt.messages;
 export const selectServer = (state) => state.mqtt.server;
 export const selectMqttStations = (state) => state.mqtt.mqtt_stations;
 export const selectMessageUnitList = (state) => state.mqtt.message_unit_list;
+export const selectAllUnitsList = (state) => state.mqtt.all_units;
 
 export default mqttSlice.reducer;
