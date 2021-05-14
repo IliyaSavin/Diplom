@@ -4,6 +4,7 @@ import stationsReducer from '../features/stationsSlice';
 import userReducer from '../features/userSlice';
 import addStationReducer from '../features/addStationSlice';
 import logs from '../features/logsSlice';
+import mqtt from '../features/mqttSlice';
 
 //import {reducer as formReducer} from 'redux-form';
 
@@ -14,6 +15,7 @@ export default configureStore({
     user: userReducer,
     addStation: addStationReducer,
     logs,
+    mqtt,
     //form: formReducer,
   },
 });

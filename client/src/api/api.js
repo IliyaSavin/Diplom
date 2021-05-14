@@ -27,6 +27,17 @@ export const userAPI = {
       .then((response) => response.data),
 };
 
+export const mqttAPI = {
+  getMessages: () =>
+    instance
+      .get('server/messages', {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+};
+
 export const logsAPI = {
   getAllUsers: () =>
     instance
