@@ -4,6 +4,7 @@ const config = require('../../config/db');
 const { Connection, Request } = require("tedious");
 const requestToAPI = require('request');
 const auth = require('../../middleware/auth');
+const { request } = require('express');
 
 router.post('/addStationEcoBot', auth, async (req, res) => {
     const {id_SaveEcoBot} = req.body;
@@ -40,29 +41,37 @@ router.post('/addStationEcoBot', auth, async (req, res) => {
 
 router.post('/addStation', auth, async (req, res) => {
     const {city, name, id_server, longitude, latitude} = req.body;
+    var row = {};
     var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
-        request = new Request(`EXEC Add_Station @city = '${city}',
+        requestObj = new Request(`EXEC Add_Station @city = '${city}',
                                 @name = '${name}',
                                 @id_server = '${id_server}',
                                 @longitude = ${longitude},
-                                @latitude = ${latitude} `, function(err, rowCount, rows) {
+                                @latitude = ${latitude};
+                                select TOP(1) * from Station where ID_Server = 1 ORDER BY ID_Station DESC;`, function(err, rowCount, rows) {
             connection.close();
             if (err) {
                 console.log(err);
                 res.status(500).send('Server error');
             } else {
-                res.json({ msg: 'Station added'});
+                res.json(row);
             }
         })
-    connection.execSql(request);
+        requestObj.on("row", columns => {
+            columns.forEach(column => {
+              row[column.metadata.colName] = column.value;
+            });
+          });
+    connection.execSql(requestObj);
     })
 })
 
 router.post('/changeMessageUnit', auth, async (req, res) => {
     const {ID_Station, ID_Measured_Unit, Message, Queue_Number} = req.body;
 
+    var all = [];
     var messageStr = '';
     var queueStr = '';
 
@@ -80,22 +89,30 @@ router.post('/changeMessageUnit', auth, async (req, res) => {
     var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
-        request = new Request(
+        requestObj = new Request(
             `if exists (select * from MQTT_Message_Unit where ID_Station = '${ID_Station}' and ID_Measured_Unit = ${ID_Measured_Unit})
                 update MQTT_Message_Unit
                 set ${messageStr} ${queueStr}
                 where ID_Station = '${ID_Station}' and ID_Measured_Unit = ${ID_Measured_Unit}
             else
-                INSERT INTO MQTT_Message_Unit(ID_Station, ID_Measured_Unit, Message, Queue_Number) VALUES ('${ID_Station}', ${ID_Measured_Unit}, '${Message}', ${Queue_Number});`, function(err, rowCount, rows) {
+                INSERT INTO MQTT_Message_Unit(ID_Station, ID_Measured_Unit, Message, Queue_Number) VALUES ('${ID_Station}', ${ID_Measured_Unit}, '${Message}', ${Queue_Number}); 
+                select ID_Station, MQTT_Message_Unit.ID_Measured_Unit, Message, Title, Unit, Queue_Number from MQTT_Message_Unit inner join Measured_Unit on MQTT_Message_Unit.ID_Measured_Unit = Measured_Unit.ID_Measured_Unit where ID_Station = '${ID_Station}' and MQTT_Message_Unit.ID_Measured_Unit = '${ID_Measured_Unit}';`, function(err, rowCount, rows) {
             connection.close();
             if (err) {
                 console.log(err);
                 res.status(500).send('Server error');
             } else {
-                res.json({ msg: 'Message Unit changed'});
+                res.json(all[0]);
             }
         })
-    connection.execSql(request);
+        requestObj.on("row", columns => {
+            var row = {};
+            columns.forEach(column => {
+              row[column.metadata.colName] = column.value;
+            });
+            all.push(row);
+          });
+    connection.execSql(requestObj);
     })
 })
 
