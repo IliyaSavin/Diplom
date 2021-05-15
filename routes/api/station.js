@@ -4,7 +4,7 @@ const config = require('../../config/db');
 const { Connection, Request } = require("tedious");
 const requestToAPI = require('request');
 const auth = require('../../middleware/auth');
-const { request } = require('express');
+//const { request } = require('express');
 
 router.post('/addStationEcoBot', auth, async (req, res) => {
     const {id_SaveEcoBot} = req.body;
@@ -45,7 +45,7 @@ router.post('/addStation', auth, async (req, res) => {
     var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
-        requestObj = new Request(`EXEC Add_Station @city = '${city}',
+        request = new Request(`EXEC Add_Station @city = '${city}',
                                 @name = '${name}',
                                 @id_server = '${id_server}',
                                 @longitude = ${longitude},
@@ -59,12 +59,12 @@ router.post('/addStation', auth, async (req, res) => {
                 res.json(row);
             }
         })
-        requestObj.on("row", columns => {
+        request.on("row", columns => {
             columns.forEach(column => {
               row[column.metadata.colName] = column.value;
             });
           });
-    connection.execSql(requestObj);
+    connection.execSql(request);
     })
 })
 
@@ -89,7 +89,7 @@ router.post('/changeMessageUnit', auth, async (req, res) => {
     var connection = new Connection(config.ecoSensors);
     connection.connect();
     connection.on('connect', function(err) {
-        requestObj = new Request(
+        request = new Request(
             `if exists (select * from MQTT_Message_Unit where ID_Station = '${ID_Station}' and ID_Measured_Unit = ${ID_Measured_Unit})
                 update MQTT_Message_Unit
                 set ${messageStr} ${queueStr}
@@ -105,14 +105,14 @@ router.post('/changeMessageUnit', auth, async (req, res) => {
                 res.json(all[0]);
             }
         })
-        requestObj.on("row", columns => {
+        request.on("row", columns => {
             var row = {};
             columns.forEach(column => {
               row[column.metadata.colName] = column.value;
             });
             all.push(row);
           });
-    connection.execSql(requestObj);
+    connection.execSql(request);
     })
 })
 
