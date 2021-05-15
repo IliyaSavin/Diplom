@@ -59,7 +59,7 @@ function MqttStation() {
             <div className={s.table_header}>
               <div>
                 <Search
-                  placeholder='Action ID or Statement'
+                  placeholder='MQTT station name'
                   value={searchString}
                   enterButton
                   onChange={(e) => setSearchString(e.currentTarget.value)}

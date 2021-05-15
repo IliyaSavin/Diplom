@@ -59,13 +59,19 @@ export const mqttSlice = createSlice({
         mqtt_stations: action.payload,
       };
     },
+    updateMqttStations: (state, action) => {
+      return {
+        ...state,
+        mqtt_stations: [...state.mqtt_stations, action.payload],
+      };
+    },
     setMessageUnitList: (state, action) => {
       return {
         ...state,
         message_unit_list: action.payload,
       };
     },
-    updateMessageUnit: (state, action) => {
+    deleteMessageUnits: (state, action) => {
       return {
         ...state,
         message_unit_list: [
@@ -73,6 +79,12 @@ export const mqttSlice = createSlice({
             (m) => m.ID_Measured_Unit != action.payload.ID_Measured_Unit
           ),
         ],
+      };
+    },
+    updateMessageUnit: (state, action) => {
+      return {
+        ...state,
+        message_unit_list: [...state.message_unit_list, action.payload],
       };
     },
     setAllUnits: (state, action) => {
@@ -93,8 +105,10 @@ export const {
   updateStatusServer,
   setMqttStations,
   setMessageUnitList,
-  updateMessageUnit,
+  deleteMessageUnits,
   setAllUnits,
+  updateMessageUnit,
+  updateMqttStations,
 } = mqttSlice.actions;
 
 //@Thunks
@@ -140,11 +154,9 @@ export const deleteMessageUnit =
   (ID_Station, ID_Measured_Unit) => async (dispatch) => {
     dispatch(setLoading({units: true}));
     let data = await mqttAPI.deleteMessageUnit(ID_Station, ID_Measured_Unit);
-    dispatch(updateMessageUnit(data));
-    console.log(data, '555555555555555555555555555555');
+    dispatch(deleteMessageUnits(data));
     dispatch(setLoading({units: undefined}));
   };
-
 export const getAllUnits = () => async (dispatch) => {
   dispatch(setLoading({unitsList: true}));
   let data = await mqttAPI.getAllUnits();
@@ -161,7 +173,8 @@ export const addMessage =
       Message,
       Queue_Number
     );
-    // dispatch(setAllUnits(data));
+    console.log(data, 'addddddddddddddddddddddddddddddddd');
+    dispatch(updateMessageUnit(data));
     dispatch(setLoading({units: undefined}));
   };
 
@@ -175,7 +188,7 @@ export const addMqtt =
       longitude,
       latitude
     );
-    // dispatch(setAllUnits(data));
+    dispatch(updateMqttStations(data));
     dispatch(setLoading({units: undefined}));
   };
 // @SELECTORS
