@@ -1,6 +1,15 @@
-import React, {useState} from 'react';
+import React, {useRef, useState} from 'react';
 import {Form, Input, Button} from 'antd';
+import {useDispatch, useSelector} from 'react-redux';
+import {selectServer} from '../../../redux/features/mqttSlice';
+
+import {addMqtt} from '../../../redux/features/mqttSlice';
+
 function Formm() {
+  const dispatch = useDispatch();
+  const server = useSelector(selectServer);
+  const ref = useRef();
+
   const [formFields, setFormFields] = useState({
     name: '',
     city: '',
@@ -16,12 +25,26 @@ function Formm() {
     wrapperCol: {offset: 0, span: 24},
   };
 
-  const onFinish = () => {};
+  const onFinish = (values) => {
+    if (server) {
+      dispatch(
+        addMqtt(
+          values.city,
+          values.name,
+          server.ID_Server,
+          values.longitude,
+          values.latitude
+        )
+      );
+      ref.current.resetFields();
+    }
+  };
 
   const onFinishFailed = () => {};
   return (
     <Form
       {...layout}
+      ref={ref}
       name='basic'
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
@@ -59,6 +82,7 @@ function Formm() {
         rules={[{required: true, message: 'Please input longitude!'}]}
       >
         <Input
+          type={'number'}
           value={formFields.longitude}
           onChange={(e) =>
             setFormFields({...formFields, longitude: e.currentTarget.value})
@@ -72,6 +96,7 @@ function Formm() {
         rules={[{required: true, message: 'Please input latitude!'}]}
       >
         <Input
+          type={'number'}
           value={formFields.latitude}
           onChange={(e) =>
             setFormFields({...formFields, latitude: e.currentTarget.value})

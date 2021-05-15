@@ -104,6 +104,18 @@ export const mqttAPI = {
         }
       )
       .then((response) => response.data),
+  addMqtt: (city, name, id_server, longitude, latitude) =>
+    instance
+      .post(
+        'station/addStation',
+        {city, name, id_server, longitude, latitude},
+        {
+          headers: {
+            'x-auth-token': sessionStorage.getItem('token'),
+          },
+        }
+      )
+      .then((response) => response.data),
 };
 
 export const logsAPI = {

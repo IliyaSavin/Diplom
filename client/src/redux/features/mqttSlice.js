@@ -165,6 +165,19 @@ export const addMessage =
     dispatch(setLoading({units: undefined}));
   };
 
+export const addMqtt =
+  (city, name, id_server, longitude, latitude) => async (dispatch) => {
+    dispatch(setLoading({units: true}));
+    let data = await mqttAPI.addMqtt(
+      city,
+      name,
+      id_server,
+      longitude,
+      latitude
+    );
+    // dispatch(setAllUnits(data));
+    dispatch(setLoading({units: undefined}));
+  };
 // @SELECTORS
 
 export const selectIsLoading = (state) => state.mqtt.isLoading;
