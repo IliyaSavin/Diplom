@@ -1,7 +1,7 @@
 import {Button, Layout, Menu} from 'antd';
 import {RadarChartOutlined} from '@ant-design/icons';
 import React, {useState} from 'react';
-import {Link, Redirect, Route, Switch} from 'react-router-dom';
+import {Link, Redirect, Route, Switch, useLocation} from 'react-router-dom';
 import {useDispatch, useSelector} from 'react-redux';
 import {selectIsAuth, setAuth} from '../../redux/features/authSlice';
 import StationsPage from '../StationsPage/StationsPage';
@@ -11,6 +11,7 @@ import AddStation from '../AddStation/AddStation';
 import s from './LayoutApp.module.sass';
 import Logs from '../Logs/Logs';
 import Report from '../Report/Report';
+import MqttStation from '../MqttStation/MqttStation';
 
 const {SubMenu} = Menu;
 const {Content, Sider} = Layout;
@@ -47,6 +48,9 @@ const LayoutApp = () => {
               <Menu.Item key='3'>
                 <Link to='/addstation'>Add Station</Link>
               </Menu.Item>
+              <Menu.Item key='3.1'>
+                <Link to='/mqtt'>Add MQTT</Link>
+              </Menu.Item>
               <Menu.Item key='4'>
                 <Link to='/logs'>Activity Logs</Link>
               </Menu.Item>
@@ -82,6 +86,7 @@ const LayoutApp = () => {
               <Route exact path='/' component={StationsPage} />
               <Route exact path='/createuser' component={CreateUser} />
               <Route exact path='/addstation' component={AddStation} />
+              <Route exact path='/mqtt' component={MqttStation} />
               <Route exact path='/logs' component={Logs} />
               <Route exact path='/report' component={Report} />
             </Switch>
@@ -93,3 +98,4 @@ const LayoutApp = () => {
 };
 
 export default LayoutApp;
+// іві

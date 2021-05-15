@@ -27,6 +27,85 @@ export const userAPI = {
       .then((response) => response.data),
 };
 
+export const mqttAPI = {
+  getMessages: (searchString = '') =>
+    instance
+      .get(`server/messages${searchString}`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+  getServers: () =>
+    instance
+      .get(`server`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+  setServerStatus: (id, status) =>
+    instance
+      .post(
+        'server/status',
+        {id, status},
+        {
+          headers: {
+            'x-auth-token': sessionStorage.getItem('token'),
+          },
+        }
+      )
+      .then((response) => response.data),
+  getMqttStationsList: () =>
+    instance
+      .get(`station/getMqttStationList`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+  getMessageUnitList: (stationID) =>
+    instance
+      .get(`station/getMessageUnitList?ID_Station=${stationID}`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+  deleteMessageUnit: (ID_Station, ID_Measured_Unit) =>
+    instance
+      .post(
+        'station/deleteMessageUnit',
+        {ID_Station, ID_Measured_Unit},
+        {
+          headers: {
+            'x-auth-token': sessionStorage.getItem('token'),
+          },
+        }
+      )
+      .then((response) => response.data),
+  getAllUnits: () =>
+    instance
+      .get(`station/unitsAll`, {
+        headers: {
+          'x-auth-token': sessionStorage.getItem('token'),
+        },
+      })
+      .then((response) => response.data),
+  addNewMessage: (ID_Station, ID_Measured_Unit, Message, Queue_Number) =>
+    instance
+      .post(
+        'station/changeMessageUnit',
+        {ID_Station, ID_Measured_Unit, Message, Queue_Number},
+        {
+          headers: {
+            'x-auth-token': sessionStorage.getItem('token'),
+          },
+        }
+      )
+      .then((response) => response.data),
+};
+
 export const logsAPI = {
   getAllUsers: () =>
     instance
