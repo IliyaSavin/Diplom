@@ -75,10 +75,10 @@ client.on('message', function (topic, message) {
     lastTopic = topic.toString();
   }
 
-  if (topic.toString().includes('dev05')) {
+  //if (topic.toString().includes('dev05')) {
     console.log(topic.toString());
     console.log(message.toString());
-  }
+  //}
   
 
   
