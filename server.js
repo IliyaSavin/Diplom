@@ -37,10 +37,13 @@ client.on('connect', function () {
 })
 
 var MqttMessageList = [];
+var LastUpdateList = [];
 
 getMqttStationList()
-setInterval(() => getMqttStationList(), 10000);
+setInterval(() => getMqttStationList(), 35000);
 setInterval(() => getMqttMessageList(), 10000);
+//setInterval(() => console.log(MqttMessageList), 20000);
+setInterval(() => serverMessageCountCheck(100), 10000);
 
 //setInterval(() => console.log(MqttMessageList), 1000);
 
@@ -71,14 +74,16 @@ client.on('message', function (topic, message) {
   // message is Buffer
   if (lastTopic != topic.toString()) {
     insertServerMessage(topic.toString(), message.toString());
+    //console.log(topic.toString());
+    //console.log(message.toString());
   } else {
     lastTopic = topic.toString();
   }
 
-  //if (topic.toString().includes('dev05')) {
-    console.log(topic.toString());
-    console.log(message.toString());
-  //}
+  if (topic.toString().includes('dev01')) {
+    //console.log(topic.toString());
+    //console.log(message.toString());
+  }
   
 
   
@@ -86,23 +91,39 @@ client.on('message', function (topic, message) {
 
   MqttMessageList.forEach(station => {
     if (topic.toString() == (station.measurmentList[station.currentParametrCount])) {
+      //console.log(`Topic match: ${topic.toString()} == ${station.measurmentList[station.currentParametrCount]}`);
+      
       station.tempMeasurment[station.measurmentList[station.currentParametrCount]] = message.toString();
       station.currentParametrCount++;
+      //console.log(station);
     }
   });
 
+  
+  var stationsChecked = 0;
   var currentDate = new Date();
+  var seconds = (currentDate.getTime() - lastUpdate.getTime()) / 1000;
+  //console.log(`Seconds: ${seconds}`);
   MqttMessageList.forEach(station => {
-    if (station.currentParametrCount >= station.measurmentList.length) {
-      var seconds = (currentDate.getTime() - lastUpdate.getTime()) / 1000;
       if (seconds >= 110) {
-        console.log(station.tempMeasurment);
-        if (workingStatus == 1) writeMeasurmentMQTT(station.ID_Station, station.tempMeasurment, station.measurmentUnitId);
-        lastUpdate = new Date();
+        if (station.isChecked == false) {
+          console.log(station.tempMeasurment);
+          if (station.currentParametrCount >= station.measurmentList.length && workingStatus == 1) writeMeasurmentMQTT(station.ID_Station, station.tempMeasurment, station.measurmentUnitId);
+          station.tempMeasurment = {};
+          station.currentParametrCount = 0;
+          station.isChecked = true;
+          stationsChecked++;
+          //console.log(`Current Station: ${station.ID_Station}`);
+          //console.log(`Checked: ${stationsChecked} from ${MqttMessageList.length}`);
+        }
       }
-      station.tempMeasurment = {};
-      station.currentParametrCount = 0;
-    }
+      if (stationsChecked >= MqttMessageList.length) {
+        lastUpdate = new Date();
+        stationsChecked = 0;
+      }
+  });
+  MqttMessageList.forEach(station => {
+    station.isChecked = false;
   });
 })
 
@@ -234,7 +255,8 @@ async function getMqttStationList() {
                 measurmentList: [],
                 measurmentUnitId: {},
                 currentParametrCount: 0,
-                tempMeasurment: {}
+                tempMeasurment: {},
+                isChecked: false
               });
             }
           });
@@ -285,6 +307,28 @@ async function insertServerMessage(Topic, Value) {
     connection.connect();
     connection.on('connect', function(err) {
         sqlRequest = new Request(`INSERT INTO Server_Message(Topic, Value) VALUES ('${Topic}', '${Value}');`, function(err, rowCount, rows) {
+            connection.close();
+            if (err) {
+                console.log(err)
+            } else {
+                //console.log(`status: ${workingStatus}`);
+            }
+        });
+        connection.execSql(sqlRequest);
+    })
+}
+
+async function serverMessageCountCheck(count) {
+  var connection = new Connection(config.ecoSensors);
+    connection.connect();
+    connection.on('connect', function(err) {
+        sqlRequest = new Request(`if (select count(Message_Date) from Server_Message) > 300
+        delete from Server_Message
+        where Message_Date in (
+        select TOP(${count}) Message_Date
+        from Server_Message
+        order by Message_Date
+        );`, function(err, rowCount, rows) {
             connection.close();
             if (err) {
                 console.log(err)
