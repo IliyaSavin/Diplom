@@ -41,7 +41,9 @@ async function createUserForLogin (login) {
         request = new Request(`CREATE USER ${login}
                                 FOR LOGIN ${login}
                                 WITH DEFAULT_SCHEMA = dbo; 
-                                ALTER ROLE db_datareader ADD MEMBER ${login};`, function(err, rowCount, rows) {
+                                ALTER ROLE db_datareader ADD MEMBER ${login};
+                                GRANT INSERT ON "dbo"."Favorite_Station" TO "${login}";
+                                GRANT DELETE ON "dbo"."Favorite_Station" TO "${login}";`, function(err, rowCount, rows) {
             ecoConnection.close();
             if (err) {
             console.log(err);

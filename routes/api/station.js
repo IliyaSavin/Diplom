@@ -143,7 +143,7 @@ router.get('/getMessageUnitList', auth, async (req, res) => {
     connection.connect();
     connection.on('connect', function(err) {
         var all = [];
-        request = new Request(`select ID_Station, MQTT_Message_Unit.ID_Measured_Unit, Message, Title, Unit, Queue_Number from MQTT_Message_Unit inner join Measured_Unit on MQTT_Message_Unit.ID_Measured_Unit = Measured_Unit.ID_Measured_Unit where ID_Station = '${url.ID_Station}';`, function(err, rowCount, rows) {
+        request = new Request(`select ID_Station, MQTT_Message_Unit.ID_Measured_Unit, Message, Title, Unit, Queue_Number from MQTT_Message_Unit inner join Measured_Unit on MQTT_Message_Unit.ID_Measured_Unit = Measured_Unit.ID_Measured_Unit where ID_Station = '${url.ID_Station}' order by Queue_Number;`, function(err, rowCount, rows) {
             connection.close();
             if (err) {
                 console.log(err);
