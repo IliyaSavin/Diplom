@@ -8,6 +8,7 @@ import {
   selectAllUnitsList,
   selectIsLoading,
   addMessage,
+  selectMessageUnitList,
 } from '../../../redux/features/mqttSlice';
 
 const {Option} = Select;
@@ -16,6 +17,7 @@ function FormAdd({ID_Station}) {
   const dispatch = useDispatch();
   const all_units = useSelector(selectAllUnitsList);
   const isLoading = useSelector(selectIsLoading);
+  const message_unit_list = useSelector(selectMessageUnitList);
 
   const [formFields, setFormFields] = useState({
     message: '',
@@ -35,7 +37,7 @@ function FormAdd({ID_Station}) {
 
   useEffect(() => {
     dispatch(getAllUnits());
-  }, []);
+  }, [message_unit_list]);
 
   useEffect(() => {
     if (all_units) setSelectedUnit(all_units[0].ID_Measured_Unit);
@@ -49,7 +51,6 @@ function FormAdd({ID_Station}) {
   };
 
   const onFinishFailed = () => {};
-  console.log(selectedUnit, 'selecteddddddddddddddddddddddd');
 
   return (
     <Form
@@ -58,10 +59,26 @@ function FormAdd({ID_Station}) {
       onFinish={onFinish}
       onFinishFailed={onFinishFailed}
       layout='inline'
+      validateTrigger='onSubmit'
     >
       <Form.Item
         name='message'
-        rules={[{required: true, message: 'Please input message!'}]}
+        rules={[
+          {required: true, message: 'Please input message!'},
+          {
+            validator: async (rule, value) => {
+              console.log(value, '--------------------------------');
+              let exist = false;
+              message_unit_list?.map((m) => {
+                if (m.Message === value) exist = true;
+              });
+              if (exist && value !== undefined) {
+                throw new Error('Something wrong!');
+              }
+            },
+            message: 'Message already exist',
+          },
+        ]}
       >
         <Input
           style={{width: 400}}
@@ -86,17 +103,40 @@ function FormAdd({ID_Station}) {
           style={{width: 200, height: 40}}
           onChange={(v) => setSelectedUnit(v)}
         >
-          {all_units?.map((u) => (
-            <Option value={u.ID_Measured_Unit}>
-              {u.Title}, {u.Unit}
-            </Option>
-          ))}
+          {all_units
+            ?.filter((un) => {
+              let same = false;
+              message_unit_list?.map((m) => {
+                if (un.ID_Measured_Unit === m.ID_Measured_Unit) same = true;
+              });
+              return !same && un;
+            })
+            .map((u) => (
+              <Option value={u.ID_Measured_Unit}>
+                {u.Title}, {u.Unit}
+              </Option>
+            ))}
         </Select>
       </Form.Item>
 
       <Form.Item
         name='queue'
-        rules={[{required: true, message: 'Please input queue number!'}]}
+        rules={[
+          {required: true, message: 'Please input queue number!'},
+          {
+            validator: async (rule, value) => {
+              let exist = false;
+              message_unit_list?.map((m) => {
+                if (+m.Queue_Number === +value) exist = true;
+              });
+              console.log(exist, 'exxiiiiiisttttttttt');
+              if (exist) {
+                throw new Error('Something wrong!');
+              }
+            },
+            message: 'Queue number already exist',
+          },
+        ]}
       >
         <Input
           type={'number'}
