@@ -18,6 +18,16 @@ export const stationsSlice = createSlice({
     setStations: (state, action) => {
       state.allStations = action.payload;
     },
+    updateStations: (state, action) => {
+      return {
+        ...state,
+        allStations: [
+          ...state.allStations.filter(
+            (s) => s.ID_Station !== action.payload.ID_Station
+          ),
+        ],
+      };
+    },
     changeStationStatus: (state, action) => {
       state.allStations = state.allStations.map((s) => {
         if (s.ID_Station === action.payload.id) {
@@ -90,6 +100,7 @@ export const {
   setGlobalStatus,
   setLoadingStatus,
   setPage,
+  updateStations,
 } = stationsSlice.actions;
 
 //@Thunks
@@ -105,19 +116,17 @@ export const getStations = (string) => async (dispatch, getState) => {
   dispatch(setLoading(false));
 };
 
-export const changeStatusStation = (id, status) => async (
-  dispatch,
-  getState
-) => {
-  const data = await stationsAPI.changeStatus(id, status);
-  dispatch(changeStationStatus(data));
-};
+export const changeStatusStation =
+  (id, status) => async (dispatch, getState) => {
+    const data = await stationsAPI.changeStatus(id, status);
+    dispatch(changeStationStatus(data));
+  };
 
 export const deleteStation = (id, string) => async (dispatch) => {
   setLoading(true);
   const data = await stationsAPI.deleteStation(id);
   if (data.message === 'Station deleted') {
-    await dispatch(getStations('?order=idUp'));
+    await dispatch(updateStations(data));
   }
   setLoading(false);
 };
