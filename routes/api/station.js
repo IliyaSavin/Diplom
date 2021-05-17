@@ -374,6 +374,7 @@ router.post('/delete/', auth, async (req, res) => {
                 res.status(500).send('Server error');
             } else {
                 res.json({
+                    ID_Station: ID_Station,
                     message: "Station deleted"
                 });
             }
