@@ -1,16 +1,22 @@
-.login
-  min-height: 100vh
-  display: flex
-  justify-content: center
-  align-items: center
+.login-page
+  height: 100vh
 
-.logoWrapper
-  display: flex
-  flex-direction: column
-  justify-content: center
-  align-items: center
-  margin-right: 50px
-  img
-    width: 400px
-  p
-    font-size: 32px
+.login-admin-text
+  font-size: 32px
+  font-weight: 700
+  color: #8cc541
+
+  @media screen and (min-width: 768px) 
+    font-size: 55px
+
+.login-form
+  width: 90%
+
+  @media screen and (min-width: 768px) 
+    width: 100%
+
+.login-submit-btn
+  .ant-col
+    @media screen and (max-width: 575px) 
+      margin-left: 0 !important
+  

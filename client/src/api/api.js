@@ -1,23 +1,23 @@
-import axios from 'axios';
-import {loginUser} from '../redux/features/authSlice';
+import axios from 'axios'
+import { loginUser } from '../redux/features/authSlice'
 
 const instance = axios.create({
-  baseURL: '/',
+  baseURL: 'http://localhost:5000/',
   headers: {
     'Content-type': 'application/json',
   },
-});
+})
 
 export const userAPI = {
   login: (login, password) =>
     instance
-      .post('auth', {login: login, password: password})
+      .post('auth', { login: login, password: password })
       .then((response) => response.data),
   addUser: (login, password) =>
     instance
       .post(
         'admin/addUser',
-        {login: login, password: password},
+        { login: login, password: password },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -25,7 +25,7 @@ export const userAPI = {
         }
       )
       .then((response) => response.data),
-};
+}
 
 export const mqttAPI = {
   getMessages: (searchString = '') =>
@@ -48,7 +48,7 @@ export const mqttAPI = {
     instance
       .post(
         'server/status',
-        {id, status},
+        { id, status },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -76,7 +76,7 @@ export const mqttAPI = {
     instance
       .post(
         'station/deleteMessageUnit',
-        {ID_Station, ID_Measured_Unit},
+        { ID_Station, ID_Measured_Unit },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -96,7 +96,7 @@ export const mqttAPI = {
     instance
       .post(
         'station/changeMessageUnit',
-        {ID_Station, ID_Measured_Unit, Message, Queue_Number},
+        { ID_Station, ID_Measured_Unit, Message, Queue_Number },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -108,7 +108,7 @@ export const mqttAPI = {
     instance
       .post(
         'station/addStation',
-        {city, name, id_server, longitude, latitude},
+        { city, name, id_server, longitude, latitude },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -116,7 +116,7 @@ export const mqttAPI = {
         }
       )
       .then((response) => response.data),
-};
+}
 
 export const logsAPI = {
   getAllUsers: () =>
@@ -136,7 +136,7 @@ export const logsAPI = {
         },
       })
       .then((response) => response.data),
-};
+}
 
 export const stationsAPI = {
   getAllStations: (string) =>
@@ -151,7 +151,7 @@ export const stationsAPI = {
     instance
       .post(
         'station/units',
-        {ID_Station: id},
+        { ID_Station: id },
         {
           headers: {
             'x-auth-token': sessionStorage.getItem('token'),
@@ -241,4 +241,4 @@ export const stationsAPI = {
         }
       )
       .then((response) => response.data),
-};
+}

@@ -1,15 +1,15 @@
-import React from 'react';
+import React from 'react'
 
-import 'antd/dist/antd.css';
-import './App.module.sass';
+import 'antd/dist/antd.css'
+import './App.module.sass'
 
-import {Switch, Route} from 'react-router-dom';
-import {withSuspense} from '../../hoc/withSuspense/withSuspense';
-import LoginPage from '../LoginPage/LoginPage';
+import { Switch, Route } from 'react-router-dom'
+import { withSuspense } from '../../hoc/withSuspense/withSuspense'
+import LoginPage from '../LoginPage/LoginPage'
 
-const LayoutLazy = React.lazy(() => import('../Layout/LayoutApp'));
+const LayoutLazy = React.lazy(() => import('../Layout/LayoutApp'))
 
-const SuspendedLayout = withSuspense(LayoutLazy);
+const SuspendedLayout = withSuspense(LayoutLazy)
 
 function App() {
   return (
@@ -19,7 +19,7 @@ function App() {
         <Route path='/' component={SuspendedLayout} />
       </Switch>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App

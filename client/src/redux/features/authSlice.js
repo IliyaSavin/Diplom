@@ -1,58 +1,64 @@
-import {createSlice} from '@reduxjs/toolkit';
-import {userAPI} from '../../api/api';
+import { createSlice } from '@reduxjs/toolkit'
+import { userAPI } from '../../api/api'
 
 const initialState = {
   isAuth: false,
+  isLoadingAuth: false,
   loginString: '',
   passString: '',
   errorLog: '',
-};
+}
 
 export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
     setAuth: (state, action) => {
-      state.isAuth = action.payload;
+      state.isAuth = action.payload
+    },
+    setLoadingAuth: (state) => {
+      state.isLoadingAuth = !state.isLoadingAuth
     },
     setLogString: (state, action) => {
-      state.loginString = action.payload;
+      state.loginString = action.payload
     },
     setPassString: (state, action) => {
-      state.passString = action.payload;
+      state.passString = action.payload
     },
     setErrorLog: (state, action) => {
-      state.errorLog = action.payload;
+      state.errorLog = action.payload
     },
   },
-});
+})
 
 export const {
   setAuth,
   setLogString,
   setPassString,
   setErrorLog,
-} = authSlice.actions;
+  setLoadingAuth,
+} = authSlice.actions
 
 //@Thunks
 export const loginUser = (login, password) => async (dispatch) => {
-  console.log(login, password);
-  const data = await userAPI.login(login, password);
+  dispatch(setLoadingAuth())
+  const data = await userAPI.login(login, password)
 
   if (data.errors) {
-    console.log(data.errors);
-    dispatch(setErrorLog(data.errors[0].msg));
+    console.log(data.errors)
+    dispatch(setErrorLog(data.errors[0].msg))
   } else {
-    sessionStorage.setItem('token', data.token);
-    await dispatch(setAuth(true));
-    dispatch(setErrorLog(''));
+    sessionStorage.setItem('token', data.token)
+    dispatch(setAuth(true))
+    dispatch(setErrorLog(''))
   }
-};
+  dispatch(setLoadingAuth())
+}
 
 // @SELECTORS
-export const selectIsAuth = (state) => state.auth.isAuth;
-export const selectLoginString = (state) => state.auth.loginString;
-export const selectPasswordString = (state) => state.auth.passString;
-export const selectErrorLog = (state) => state.auth.errorLog;
+export const selectIsAuth = (state) => state.auth.isAuth
+export const selectLoginString = (state) => state.auth.loginString
+export const selectPasswordString = (state) => state.auth.passString
+export const selectErrorLog = (state) => state.auth.errorLog
 
-export default authSlice.reducer;
+export default authSlice.reducer
