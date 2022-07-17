@@ -18,7 +18,6 @@ import { addStation } from '../../../redux/features/addStationSlice'
 
 function Station({ station, addPage }) {
   const dot = [station.Latitude, station.Longitude]
-
   const dispatch = useDispatch()
 
   const Icon = L.icon({
