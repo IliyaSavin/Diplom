@@ -1,23 +1,49 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import 'antd/dist/antd.css'
 import './App.module.sass'
 
-import { Switch, Route } from 'react-router-dom'
-import { withSuspense } from '../../hoc/withSuspense/withSuspense'
 import LoginPage from '../LoginPage/LoginPage'
+import Header from '../Header'
+import StationsPage from '../StationsPage/StationsPage'
+import CreateUser from '../СreateUser/CreateUser'
+import AddStation from '../AddStation/AddStation'
+import MqttStation from '../MqttStation/MqttStation'
+import Logs from '../Logs/Logs'
+import Report from '../Report/Report'
+import { useDispatch, useSelector } from 'react-redux'
+import { selectIsAuth, setAuth } from '../../redux/features/authSlice'
+import { Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 
-const LayoutLazy = React.lazy(() => import('../Layout/LayoutApp'))
+const App = () => {
+  const auth = useSelector(selectIsAuth)
+  let navigate = useNavigate()
+  let dispatch = useDispatch()
+  const location = useLocation()
 
-const SuspendedLayout = withSuspense(LayoutLazy)
+  useEffect(() => {
+    if (!sessionStorage.getItem('token')) navigate('/login')
+    else dispatch(setAuth(true))
+  }, [auth, navigate, dispatch])
 
-function App() {
+  if (location.pathname === '/') navigate('/stations')
+
   return (
     <div className='app'>
-      <Switch>
-        <Route path='/login' component={LoginPage} />
-        <Route path='/' component={SuspendedLayout} />
-      </Switch>
+      <main style={{ minHeight: '100vh' }}>
+        {auth && <Header />}
+        <div className='container-xxl'>
+          <Routes>
+            <Route path='/login' element={<LoginPage />} />
+            <Route path='/stations/*' element={<StationsPage />} />
+            <Route path='/createuser' element={<CreateUser />} />
+            <Route path='/addstation' element={<AddStation />} />
+            <Route path='/mqtt' element={<MqttStation />} />
+            <Route path='/logs' element={<Logs />} />
+            <Route path='/report' element={<Report />} />
+          </Routes>
+        </div>
+      </main>
     </div>
   )
 }

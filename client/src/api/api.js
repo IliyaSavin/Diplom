@@ -1,8 +1,12 @@
 import axios from 'axios'
-import { loginUser } from '../redux/features/authSlice'
+
+const baseURL =
+  window.location.origin === 'http://localhost:3002'
+    ? 'http://localhost:5000'
+    : `${window.location.origin}/`
 
 const instance = axios.create({
-  baseURL: 'http://localhost:5000/',
+  baseURL,
   headers: {
     'Content-type': 'application/json',
   },

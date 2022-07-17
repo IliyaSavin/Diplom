@@ -45,7 +45,6 @@ export const loginUser = (login, password) => async (dispatch) => {
   const data = await userAPI.login(login, password)
 
   if (data.errors) {
-    console.log(data.errors)
     dispatch(setErrorLog(data.errors[0].msg))
   } else {
     sessionStorage.setItem('token', data.token)

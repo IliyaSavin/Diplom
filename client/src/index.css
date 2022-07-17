@@ -1,11 +1,86 @@
 @import 'bootstrap/dist/css/bootstrap.min.css';
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@100;200;300;400;500;700&display=swap');
+@import '@fortawesome/fontawesome-svg-core/styles.css';
 
 body {
   margin: 0;
+  font-family: 'Montserrat', sans-serif;
+  overflow-x: hidden;
+  width: 100% !important;
+}
+
+* {
   font-family: 'Montserrat', sans-serif;
 }
 
 .ant-pagination-options {
   display: none !important;
+}
+
+.offcanvas-start {
+  border-right: 0;
+  color: #8cc541;
+}
+
+.offcanvas-body {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+
+.offcanvas-header {
+  padding-right: 2rem;
+  padding-left: 2rem;
+}
+
+.offcanvas-tabs {
+  list-style: none;
+  padding-left: 0;
+}
+
+.offcanvas-tabs-tab {
+  font-family: 'Montserrat', sans-serif;
+  color: #0099c9;
+  font-weight: 700;
+  font-size: 24px;
+  margin-top: 1.5rem;
+}
+
+@media screen and (min-width: 768px) {
+  .offcanvas-tabs-tab {
+    font-size: 32px;
+  }
+}
+
+.active {
+  color: #00d1ff;
+}
+
+.ant-select {
+  box-shadow: none !important;
+}
+
+.ant-select-selector {
+  box-shadow: none !important;
+}
+
+.ant-pagination-item-active {
+  border-color: #8cc541 !important;
+  font-weight: 700 !important;
+}
+
+.ant-pagination-item {
+  color: #8cc541 !important;
+  font-weight: 500;
+}
+
+.btn {
+  font-size: 14px !important;
+  box-shadow: none !important;
+}
+
+.table-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
 }

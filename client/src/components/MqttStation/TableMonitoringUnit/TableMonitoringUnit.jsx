@@ -1,6 +1,6 @@
-import moment from 'moment';
-import React, {useEffect} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import moment from 'moment'
+import React, { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   deleteMessageUnit,
   getAllMessages,
@@ -8,11 +8,11 @@ import {
   selectAllMessages,
   selectIsLoading,
   selectMessageUnitList,
-} from '../../../redux/features/mqttSlice';
-import Loader from '../../Loader/Loader';
-import {Table, Button, Modal} from 'antd';
+} from '../../../redux/features/mqttSlice'
+import Loader from '../../Loader/Loader'
+import { Table, Button, Modal } from 'antd'
 
-function TableMonitoringUnit({station}) {
+function TableMonitoringUnit({ station }) {
   const columns = [
     {
       title: 'Message',
@@ -46,39 +46,44 @@ function TableMonitoringUnit({station}) {
           >
             Delete
           </Button>
-        );
+        )
       },
     },
-  ];
+  ]
 
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
-  const isLoading = useSelector(selectIsLoading);
-  const message_unit_list = useSelector(selectMessageUnitList);
+  const isLoading = useSelector(selectIsLoading)
+  const message_unit_list = useSelector(selectMessageUnitList)
 
   function warning(ID_Station, ID_Measured_Unit) {
     Modal.warning({
       title: 'Do you really want to delete?',
       centered: true,
       onOk() {
-        dispatch(deleteMessageUnit(ID_Station, ID_Measured_Unit));
+        dispatch(deleteMessageUnit(ID_Station, ID_Measured_Unit))
       },
       closable: true,
-    });
+    })
   }
 
   useEffect(() => {
-    if (station) dispatch(getMessageUnitList(station));
-  }, [station]);
+    if (station) dispatch(getMessageUnitList(station))
+  }, [station])
 
-  if (isLoading?.units) return <Loader />;
+  if (isLoading?.units)
+    return (
+      <div className='table-loading'>
+        <Loader />
+      </div>
+    )
   return (
     <Table
-      pagination={{pageSize: 5, position: ['bottomCenter']}}
+      pagination={{ pageSize: 5, position: ['bottomCenter'] }}
       columns={columns}
       dataSource={message_unit_list}
     />
-  );
+  )
 }
 
-export default TableMonitoringUnit;
+export default TableMonitoringUnit

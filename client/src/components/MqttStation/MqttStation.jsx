@@ -1,11 +1,11 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import {setCurrentPageIndex} from '../../redux/features/stationsSlice';
-import Formm from './Form/Form';
-import s from './MqttStation.module.sass';
-import TableMonitoring from './TableMonitoring/TableMonitoring';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { setCurrentPageIndex } from '../../redux/features/stationsSlice'
+import Formm from './Form/Form'
+import s from './MqttStation.module.sass'
+import TableMonitoring from './TableMonitoring/TableMonitoring'
 
-import {Input, Switch, Select} from 'antd';
+import { Input, Switch, Select } from 'antd'
 import {
   getAllMessages,
   getMqttList,
@@ -14,39 +14,36 @@ import {
   selectMqttStations,
   selectServer,
   setServerStatus,
-} from '../../redux/features/mqttSlice';
-import TableMonitoringUnit from './TableMonitoringUnit/TableMonitoringUnit';
-import Loader from '../Loader/Loader';
-import FormAdd from './FormAdd/FormAdd';
-const {Search} = Input;
-const {Option} = Select;
+} from '../../redux/features/mqttSlice'
+import TableMonitoringUnit from './TableMonitoringUnit/TableMonitoringUnit'
+import Loader from '../Loader/Loader'
+import FormAdd from './FormAdd/FormAdd'
+const { Search } = Input
+const { Option } = Select
 
 function MqttStation() {
-  const dispatch = useDispatch();
-  const isLoading = useSelector(selectIsLoading);
-  const server = useSelector(selectServer);
-  const mqtt_stations = useSelector(selectMqttStations);
+  const dispatch = useDispatch()
+  const isLoading = useSelector(selectIsLoading)
+  const server = useSelector(selectServer)
+  const mqtt_stations = useSelector(selectMqttStations)
 
-  const [selected_mqtt, setSelected_Mqtt] = useState(undefined);
-  const [searchString, setSearchString] = useState('');
-
-  useEffect(() => {
-    dispatch(setCurrentPageIndex(['3.1']));
-    dispatch(getServers());
-    dispatch(getMqttList());
-  }, []);
+  const [selected_mqtt, setSelected_Mqtt] = useState(undefined)
+  const [searchString, setSearchString] = useState('')
 
   useEffect(() => {
-    if (mqtt_stations) setSelected_Mqtt(mqtt_stations[0].ID_Station);
-  }, [mqtt_stations]);
+    dispatch(setCurrentPageIndex(['3.1']))
+    dispatch(getServers())
+    dispatch(getMqttList())
+  }, [])
+
+  useEffect(() => {
+    if (mqtt_stations) setSelected_Mqtt(mqtt_stations[0].ID_Station)
+  }, [mqtt_stations])
 
   const onChangeSwitch = (checked) => {
-    console.log(checked);
-    let status = checked ? 'enabled' : 'disabled';
-    dispatch(setServerStatus(server.ID_Server, status));
-  };
-
-  console.log(selected_mqtt, 'mqqqqqtttt');
+    let status = checked ? 'enabled' : 'disabled'
+    dispatch(setServerStatus(server.ID_Server, status))
+  }
 
   return (
     <div className={s.mqttStation}>
@@ -74,7 +71,7 @@ function MqttStation() {
                   loading={isLoading?.server}
                   checked={server?.Status === 'enabled'}
                   onChange={onChangeSwitch}
-                  style={{marginLeft: 10 + 'px'}}
+                  style={{ marginLeft: 10 + 'px' }}
                 />
               </div>
             </div>
@@ -89,7 +86,7 @@ function MqttStation() {
           Chose MQTT Station
           <Select
             value={selected_mqtt}
-            style={{width: 120, marginLeft: 20}}
+            style={{ width: 120, marginLeft: 20 }}
             onChange={(v) => setSelected_Mqtt(v)}
             className={s.select}
             loading={isLoading?.units}
@@ -112,7 +109,7 @@ function MqttStation() {
         )}
       </div>
     </div>
-  );
+  )
 }
 
-export default MqttStation;
+export default MqttStation

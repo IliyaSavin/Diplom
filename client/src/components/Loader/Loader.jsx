@@ -1,37 +1,8 @@
-import React from 'react';
-import './Loader.scss';
+import React from 'react'
+import './Loader.scss'
 
 function Loader() {
-  return (
-    <div className='loader-wrapper'>
-      <div className='boxes'>
-        <div className='box'>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className='box'>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className='box'>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-        <div className='box'>
-          <div></div>
-          <div></div>
-          <div></div>
-          <div></div>
-        </div>
-      </div>
-    </div>
-  );
+  return <div className='loader'></div>
 }
 
-export default Loader;
+export default Loader

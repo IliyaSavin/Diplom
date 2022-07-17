@@ -1,29 +1,29 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
-import Loader from '../Loader/Loader';
-import {setCurrentPageIndex} from '../../redux/features/stationsSlice';
-import s from './Logs.module.sass';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import Loader from '../Loader/Loader'
+import { setCurrentPageIndex } from '../../redux/features/stationsSlice'
+import s from './Logs.module.sass'
+import './Logs.sass'
 
-import {Table, Checkbox} from 'antd';
+import { Table, Checkbox } from 'antd'
 import {
   getAllData,
   getAllUsers,
   selectAllLogs,
   selectAllUsers,
   selectLoading,
-} from '../../redux/features/logsSlice';
+} from '../../redux/features/logsSlice'
 
-import {Select} from 'antd';
+import { Select } from 'antd'
 
-import {DatePicker, Space, Input} from 'antd';
-import moment from 'moment';
-import {useHistory} from 'react-router';
+import { DatePicker, Space, Input } from 'antd'
+import moment from 'moment'
 
-const {RangePicker} = DatePicker;
+const { RangePicker } = DatePicker
 
-const {Option} = Select;
+const { Option } = Select
 
-const {Search} = Input;
+const { Search } = Input
 
 const columns = [
   {
@@ -32,9 +32,9 @@ const columns = [
     key: 'event_time',
     align: 'center',
     render: (text) => {
-      var dateFormat = 'YYYY-MM-DD HH:mm:ss';
+      var dateFormat = 'YYYY-MM-DD HH:mm:ss'
 
-      return <b>{moment(text, dateFormat).format(dateFormat)}</b>;
+      return <b>{moment(text, dateFormat).format(dateFormat)}</b>
     },
   },
   {
@@ -53,7 +53,7 @@ const columns = [
         <div className={s.wrap}>
           <div type={`${text}`} className={s.succeeded}></div>
         </div>
-      );
+      )
     },
   },
   {
@@ -68,7 +68,7 @@ const columns = [
     dataIndex: 'statement',
 
     render: (text, record) => (
-      <div style={{wordWrap: 'break-word', wordBreak: 'break-word'}}>
+      <div style={{ wordWrap: 'break-word', wordBreak: 'break-word' }}>
         {text}
       </div>
     ),
@@ -90,7 +90,7 @@ const columns = [
     dataIndex: 'duration_milliseconds',
     align: 'center',
   },
-];
+]
 
 const data = [
   {
@@ -114,142 +114,145 @@ const data = [
     address: 'Sidney No. 1 Lake Park',
     tags: ['cool', 'teacher'],
   },
-];
+]
 
 function Logs() {
-  const dispatch = useDispatch();
-  const history = useHistory();
+  const dispatch = useDispatch()
 
-  const allUsers = useSelector(selectAllUsers);
-  const loading = useSelector(selectLoading);
-  const logs = useSelector(selectAllLogs);
+  const allUsers = useSelector(selectAllUsers)
+  const loading = useSelector(selectLoading)
+  const logs = useSelector(selectAllLogs)
 
-  const [selectedUser, setSelectedUser] = useState(0);
-  const [order, setOrder] = useState('Up');
-  const [onlyErrors, setOnlyErrors] = useState(false);
-  const [searchString, setSearchString] = useState('');
-  const [nextLoad, setNextLoad] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(0)
+  const [order, setOrder] = useState('Up')
+  const [onlyErrors, setOnlyErrors] = useState(false)
+  const [searchString, setSearchString] = useState('')
+  const [nextLoad, setNextLoad] = useState(false)
 
-  var dateFormat = 'YYYY-MM-DD HH:mm:ss';
+  var dateFormat = 'YYYY-MM-DD HH:mm:ss'
 
-  const [dateEnd, setDateEnd] = useState(moment(new Date(), dateFormat));
+  const [dateEnd, setDateEnd] = useState(moment(new Date(), dateFormat))
   const [dateStart, setDateStart] = useState(
     moment(new Date(), dateFormat).subtract(1, 'days')
-  );
+  )
 
   const parseSearch = () => {
-    const searchStr = searchString ? `&searchString=${searchString}` : '';
-    let string = '';
+    const searchStr = searchString ? `&searchString=${searchString}` : ''
+    let string = ''
     if (allUsers?.length > 0) {
       string = `?order=${order}${searchStr}&onlyErrors=${onlyErrors}&dateFrom=${dateStart.format(
         dateFormat
-      )}&dateTo=${dateEnd.format(dateFormat)}&user=${allUsers[selectedUser]}`;
+      )}&dateTo=${dateEnd.format(dateFormat)}&user=${allUsers[selectedUser]}`
     }
+    return string
+  }
 
-    console.log(string);
-    // history.push('/logs/' + string);
-    return string;
-  };
-
-  parseSearch();
+  parseSearch()
 
   useEffect(() => {
-    dispatch(setCurrentPageIndex(['4']));
-    dispatch(getAllUsers());
-    dispatch(getAllData(parseSearch()));
-    setNextLoad(true);
-  }, []);
+    dispatch(setCurrentPageIndex(['4']))
+    dispatch(getAllUsers())
+    dispatch(getAllData(parseSearch()))
+    setNextLoad(true)
+  }, [])
 
   useEffect(() => {
     if (nextLoad) {
-      dispatch(getAllData(parseSearch()));
+      dispatch(getAllData(parseSearch()))
     }
-  }, [dateStart, dateEnd]);
+  }, [dateStart, dateEnd])
 
   useEffect(() => {
     if (nextLoad) {
-      dispatch(getAllData(parseSearch()));
+      dispatch(getAllData(parseSearch()))
     }
-  }, [onlyErrors]);
+  }, [onlyErrors])
 
   useEffect(() => {
     if (nextLoad) {
-      dispatch(getAllData(parseSearch()));
+      dispatch(getAllData(parseSearch()))
     }
-  }, [order]);
+  }, [order])
 
   useEffect(() => {
     if (nextLoad) {
-      dispatch(getAllData(parseSearch()));
+      dispatch(getAllData(parseSearch()))
     }
-  }, [selectedUser]);
+  }, [selectedUser])
 
   const onChange = (date, dateString) => {
-    setDateStart(moment(dateString[0], dateFormat));
-    setDateEnd(moment(dateString[1], dateFormat));
-  };
+    setDateStart(moment(dateString[0], dateFormat))
+    setDateEnd(moment(dateString[1], dateFormat))
+  }
 
-  if (loading) return <Loader />;
+  if (loading)
+    return (
+      <div className='table-loading mt-5'>
+        <Loader />
+      </div>
+    )
 
   return (
-    <div className={s.logs}>
-      <div className={s.header_wrapper}>
-        <div className={s.wrappers_function}>
-          <Search
-            placeholder='Action ID or Statement'
-            value={searchString}
-            enterButton
-            onChange={(e) => setSearchString(e.currentTarget.value)}
-            onSearch={() => dispatch(getAllData(parseSearch()))}
-          />
+    <div className='logs'>
+      <div className='logs-card'>
+        <div className={s.header_wrapper}>
+          <div className={s.wrappers_function}>
+            <Search
+              placeholder='Action ID or Statement'
+              value={searchString}
+              enterButton
+              onChange={(e) => setSearchString(e.currentTarget.value)}
+              onSearch={() => dispatch(getAllData(parseSearch()))}
+            />
+          </div>
+          <div className={s.wrappers_function}>
+            User:{' '}
+            <Select
+              style={{ width: 170 }}
+              className={s.select}
+              defaultValue={selectedUser}
+              onChange={(value) => setSelectedUser(value)}
+            >
+              {allUsers?.map((u, index) => (
+                <Option key={index} value={index}>
+                  {u}
+                </Option>
+              ))}
+            </Select>
+          </div>
+          <div className={s.wrappers_function}>
+            <RangePicker
+              defaultValue={[dateStart, dateEnd]}
+              format={dateFormat}
+              onChange={onChange}
+              showTime
+            />
+          </div>
+          <div className={s.wrappers_function}>
+            <Checkbox
+              checked={onlyErrors}
+              onChange={() => setOnlyErrors(!onlyErrors)}
+            >
+              Only Errors
+            </Checkbox>
+          </div>
+          <div className={s.wrappers_function}>
+            Order:{' '}
+            <Select
+              style={{ width: 80 }}
+              className={s.select}
+              defaultValue={order}
+              onChange={(value) => setOrder(value)}
+            >
+              <Option value='Up'>Up</Option>
+              <Option value='Down'>Down</Option>
+            </Select>
+          </div>
         </div>
-        <div className={s.wrappers_function}>
-          User:{' '}
-          <Select
-            style={{width: 170}}
-            className={s.select}
-            defaultValue={selectedUser}
-            onChange={(value) => setSelectedUser(value)}
-          >
-            {allUsers?.map((u, index) => (
-              <Option key={index} value={index}>
-                {u}
-              </Option>
-            ))}
-          </Select>
-        </div>
-        <div className={s.wrappers_function}>
-          <RangePicker
-            defaultValue={[dateStart, dateEnd]}
-            format={dateFormat}
-            onChange={onChange}
-            showTime
-          />
-        </div>
-        <div className={s.wrappers_function}>
-          <Checkbox
-            checked={onlyErrors}
-            onChange={() => setOnlyErrors(!onlyErrors)}
-          >
-            Only Errors
-          </Checkbox>
-        </div>
-        <div className={s.wrappers_function}>
-          Order:{' '}
-          <Select
-            style={{width: 80}}
-            className={s.select}
-            defaultValue={order}
-            onChange={(value) => setOrder(value)}
-          >
-            <Option value='Up'>Up</Option>
-            <Option value='Down'>Down</Option>
-          </Select>
-        </div>
+        <Table columns={columns} dataSource={logs} />
       </div>
-      <Table columns={columns} dataSource={logs} />
     </div>
-  );
+  )
 }
 
-export default Logs;
+export default Logs

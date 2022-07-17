@@ -3,7 +3,7 @@ import './LoginPage.sass'
 import Logo from '../../img/logo.png'
 
 import { Form, Input, Button, Row } from 'antd'
-import { Redirect } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   loginUser,
@@ -53,7 +53,7 @@ const LoginPage = React.memo(({ history }) => {
 
   const onFinishFailed = (errorInfo) => {}
 
-  if (auth) return <Redirect to={'/'} />
+  if (auth) return <Navigate to={'/stations/?order=idUp'} />
   return (
     <div className='container-xxl login-page d-flex align-items-center justify-content-center'>
       <div className='row w-100'>

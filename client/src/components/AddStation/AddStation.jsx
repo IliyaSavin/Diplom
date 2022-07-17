@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react';
-import {useDispatch, useSelector} from 'react-redux';
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   selectAllStationEcoBot,
   selectIsLoading,
@@ -8,131 +8,141 @@ import {
   setPage,
   selectCityList,
   getCityList,
-} from '../../redux/features/addStationSlice';
-import {setCurrentPageIndex} from '../../redux/features/stationsSlice';
-import Loader from '../Loader/Loader';
-import Station from './Station/Station';
-import s from './AddStation.module.sass';
-import {Input, Select, Switch, Pagination, Modal} from 'antd';
+} from '../../redux/features/addStationSlice'
+import Loader from '../Loader/Loader'
+import Station from '../StationsPage/Station/Station'
+import './AddStation.sass'
+import { Select, Pagination } from 'antd'
+import { useSearchParams } from 'react-router-dom'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons'
+import { debounce } from 'lodash'
 
-const {Search} = Input;
-const {Option} = Select;
+const { Option } = Select
+
 function AddStation() {
-  const dispatch = useDispatch();
+  const [searchParams, setSearchParams] = useSearchParams({
+    city: 'All',
+  })
+  const [searchString, setSearchString] = useState(
+    searchParams.get('searchString') ?? ''
+  )
 
-  const allStations = useSelector(selectAllStationEcoBot);
-  const isLoading = useSelector(selectIsLoading);
-  const page = useSelector(selectPage);
-  const cityList = useSelector(selectCityList);
+  const dispatch = useDispatch()
 
-  let pageSize = 10;
-  const [searchValue, setSearchValue] = useState('');
-  const [selectedCityIndex, setSelectedCityIndex] = useState(0);
+  const allStations = useSelector(selectAllStationEcoBot)
+  const isLoading = useSelector(selectIsLoading)
+  const page = useSelector(selectPage)
+  const cityList = useSelector(selectCityList)
 
-  useEffect(() => {
-    dispatch(setCurrentPageIndex(['3']));
-    dispatch(getCityList());
-  }, []);
-
-  useEffect(() => {
-    cityList &&
-      dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
-  }, [cityList]);
-
-  useEffect(() => {
-    if (cityList !== undefined) {
-      let string = searchValue
-        ? `?searchString=${searchValue}&city=${cityList[selectedCityIndex]}`
-        : `?city=${cityList[selectedCityIndex]}`;
-      cityList && dispatch(getEcoBotStations(string));
+  const debouncedSetString = debounce(() => {
+    if (!searchString) {
+      searchParams.delete('searchString')
+    } else {
+      searchParams.set('searchString', searchString)
     }
-  }, [selectedCityIndex]);
+    setSearchParams(searchParams)
+  }, 500)
 
   useEffect(() => {
-    if (!searchValue && cityList !== undefined)
-      dispatch(getEcoBotStations(`?city=${cityList[selectedCityIndex]}`));
-  }, [searchValue]);
-
-  let portionStation = allStations?.slice(page * 10 - 10, page * pageSize);
+    dispatch(getCityList())
+  }, [dispatch])
 
   useEffect(() => {
-    if (allStations !== undefined) {
-      portionStation = allStations.slice(page * 10 - 10, page * pageSize);
-    }
-  }, [page]);
+    const search = `?${searchParams.toString()}`
+    dispatch(getEcoBotStations(search))
+  }, [searchParams, dispatch])
 
   useEffect(() => {
-    if (allStations !== undefined) {
-      portionStation = allStations.slice(page * 10 - 10, page * pageSize);
-      dispatch(setPage(1));
-    }
-  }, [allStations]);
+    debouncedSetString()
 
-  const onSearch = (value) => {
-    setSearchValue(value);
-    let string = searchValue
-      ? `?searchString=${value}&city=${cityList[selectedCityIndex]}`
-      : `?city=${cityList[selectedCityIndex]}`;
-    dispatch(getEcoBotStations(string));
-  };
-  const onChangePage = (page, pageSize) => {
-    dispatch(setPage(page));
-    window.scrollTo(0, 0);
-  };
+    return () => debouncedSetString.cancel()
+  }, [searchString, debouncedSetString])
+
+  const onChangePage = (page) => {
+    dispatch(setPage(page))
+    window.scrollTo(0, 0)
+  }
 
   const onChangeSelect = (value) => {
-    setSelectedCityIndex(value);
-  };
+    searchParams.set('city', value)
+    setSearchParams(searchParams)
+  }
 
-  console.log(portionStation);
-
-  if (isLoading) return <Loader />;
+  const onChangeSearchString = (e) => {
+    setSearchString(e.target.value)
+  }
 
   return (
-    <div className={s.addStation}>
-      <div className={s.header}>
-        <div className={s.searchWrapper}>
-          <Search
-            placeholder='Search stations by name'
-            onSearch={onSearch}
-            className={s.search}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.currentTarget.value)}
+    <>
+      <div className='row gy-4 stations-nav align-items-center gx-2'>
+        <div className='col-md-7 col-12 position-relative'>
+          <input
+            type='text'
+            className='form-control stations-search'
+            id='search'
+            placeholder='Type station name ...'
+            value={searchString}
+            onChange={onChangeSearchString}
+          />
+          <FontAwesomeIcon
+            icon={faMagnifyingGlass}
+            color='#8cc541'
+            className='stations-search-icon'
           />
         </div>
-        <div className={s.sortWrapper}>
-          City
-          <div>
-            <Select
-              style={{width: 170}}
-              className={s.select}
-              onChange={onChangeSelect}
-              defaultValue={selectedCityIndex}
-            >
-              {cityList?.map((c, index) => (
-                <Option key={index} value={index}>
-                  {c}
-                </Option>
-              ))}
-            </Select>
-          </div>
+        <div className='col-md-5 col-12 ps-md-4 d-flex align-items-center justify-content-md-center justify-content-start'>
+          <p className='nav-city mb-0 me-4'>City</p>
+          <Select
+            style={{ width: 170 }}
+            onChange={onChangeSelect}
+            defaultValue={searchParams.get('city')}
+          >
+            {cityList?.map((c, index) => (
+              <Option key={index} value={c}>
+                {c}
+              </Option>
+            ))}
+          </Select>
         </div>
       </div>
-      <div className={s.stationWrapper}>
-        {portionStation !== undefined &&
-          portionStation.map((s) => (
-            <Station key={s.ID_SaveEcoBot} station={s} />
-          ))}
-        <Pagination
-          className={s.pagination}
-          defaultCurrent={page}
-          total={allStations?.length}
-          onChange={onChangePage}
-          showSizeChanger={false}
-        />
+      <div className='row pb-5'>
+        <div className='col-12'>
+          {isLoading && !allStations?.length ? (
+            <div
+              style={{ width: 'fit-content', marginTop: '20%' }}
+              className='h-100 mx-auto'
+            >
+              <Loader />
+            </div>
+          ) : (
+            <div className='row mt-4 gy-4'>
+              {allStations
+                ?.slice(
+                  page === 1 ? 0 : (page - 1) * 10,
+                  page === 1 ? 10 : page * 10
+                )
+                .map((station) => (
+                  <Station addPage station={station} />
+                ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
-  );
+      {!isLoading && allStations?.length ? (
+        <div className='row pb-5'>
+          <div className='col-12 d-flex justify-content-center'>
+            <Pagination
+              current={page}
+              total={allStations?.length}
+              onChange={onChangePage}
+              showSizeChanger={false}
+            />
+          </div>
+        </div>
+      ) : null}
+    </>
+  )
 }
 
-export default AddStation;
+export default AddStation
