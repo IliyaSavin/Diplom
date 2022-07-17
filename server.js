@@ -417,8 +417,6 @@ app.use('/station', require('./routes/api/station'))
 app.use('/admin', require('./routes/api/admin'))
 app.use('/auth', require('./routes/api/auth'))
 
-app.get('/', (req, res) => {})
-
 // Serve static assets in production
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static('client/build'))
