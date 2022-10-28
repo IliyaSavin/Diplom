@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Back-end for smart home project",
   "main": "server.js",
+  "engines": {
+    "node": "17.x"
+  },
   "scripts": {
     "start": "node server",
     "server": "nodemon server",
